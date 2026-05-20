@@ -1,0 +1,17 @@
+// Retrieve recipes from the Edamam database
+async function fetchFromEdamam(fullUrl, edamamAccountUser) {
+    const response = await fetch(fullUrl, {
+            headers: {
+                'Edamam-Account-User': edamamAccountUser,
+            }
+        });
+    
+    // Check if the response is OK (status code 200-299)
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+module.exports = { fetchFromEdamam };
