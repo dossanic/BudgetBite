@@ -1,6 +1,6 @@
 ﻿# BudgetBite
-Frontend:
-## Install dependencies
+## Frontend:
+### Install dependencies
 npm install
-## Run frontend
+### Run frontend
 npm start 
