@@ -1,6 +1,12 @@
 ﻿# BudgetBite
-## Frontend:
+## Frontend
 ### Install dependencies
-npm install
+Run `npm install`
 ### Run frontend
-npm start 
+Navigate to /frontend
+Run `npm start` 
+## Backend
+### Run backend
+Navigate to /backend
+Run `npm start `
+
