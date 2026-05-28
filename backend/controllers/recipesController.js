@@ -2,7 +2,7 @@ const { fetchFromEdamam } = require('../services/edamamService');
 const { recipeSearchUrl, edamamAccountUser } = require('../config');
 
 // Fetch recipes from the Edamam API and return to the client
-async function getRecipes(req, res) {
+async function getMultipleRecipes(req, res) {
     try {
         const data = await fetchFromEdamam(recipeSearchUrl, edamamAccountUser);
         res.json(data);
@@ -12,4 +12,4 @@ async function getRecipes(req, res) {
     }
 }
 
-module.exports = { getRecipes };
+module.exports = { getRecipes: getMultipleRecipes };

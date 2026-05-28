@@ -6,6 +6,9 @@ const apiKey = process.env.API_KEY;
 const apiUrl = process.env.ENDPOINT_URL;
 const edamamAccountUser = apiId; // Edamam uses the same value for app_id and Edamam-Account-User
 
+// TODO: Combine these params into one object
+// const searchParams 
+
 // Query parameters for Recipe Search
 const recipeSearchParams = new URLSearchParams({
     type: 'public',
@@ -24,11 +27,11 @@ const ingredientSearchParams = new URLSearchParams({
 
 // Full API URL
 const recipeSearchUrl = `${apiUrl}?${recipeSearchParams.toString()}`;
-const ingredientSearchUrl = `${apiUrl}/${recipeId}?${ingredientSearchParams.toString()}`;
+const recipeReturnUrl = `${apiUrl}/${recipeId}?${ingredientSearchParams.toString()}`;
 
 module.exports = {
     port: process.env.PORT || 3000,
     recipeSearchUrl,
-    ingredientSearchUrl,
+    ingredientSearchUrl: recipeReturnUrl,
     edamamAccountUser
 };

@@ -3,7 +3,7 @@ const { ingredientSearchUrl, edamamAccountUser } = require("../config");
 const supabase = require("../supabaseClient");
 
 // Fetch ingredients from the Edamam API and return to the client
-async function getIngredients(req, res) {
+async function getSingleRecipe(req, res) {
   try {
     const data = await fetchFromEdamam(ingredientSearchUrl, edamamAccountUser);
     res.json(data);
@@ -68,4 +68,4 @@ async function getPriceEstimate(req, res) {
   });
 }
 
-module.exports = { getIngredients, getPriceEstimate };
+module.exports = { getSingleRecipe, getPriceEstimate };
