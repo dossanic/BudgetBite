@@ -5,15 +5,15 @@ function Header() {
     return (
 
         
-        <header>
+        <header className="header">
             {/* webpage header */}
             <div>
-                <h1>BudgetBite</h1>
+                <h1 className="logo">BudgetBite</h1>
             </div>
 
             {/* navigation links */}
             <nav>
-                <ul>
+                <ul className="nav-links">
                     <li>
                         <a href="#search">Find Recipes</a>
                     </li>
@@ -24,7 +24,7 @@ function Header() {
             </nav>
 
             {/* user will be able to login later */}
-            <div>
+            <div className="user-box">
                 <span>Welcome, User</span>
             </div>
 

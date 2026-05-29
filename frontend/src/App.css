@@ -1,0 +1,148 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #fff7e8, #f8efe1);
+  color: #2f2f2f;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  background-color: #fffaf2;
+  padding: 20px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+  color: #d66b2f;
+  font-size: 32px;
+  margin: 0;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #4a3b2a;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: #d66b2f;
+}
+
+.user-box {
+  background-color: #ffe6c7;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.main-content {
+  padding: 60px 20px;
+}
+
+.dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-card {
+  background-color: white;
+  width: 100%;
+  max-width: 650px;
+  padding: 40px;
+  border-radius: 25px;
+  box-shadow: 0 10px 30px rgba(108, 73, 38, 0.15);
+  text-align: center;
+}
+
+.dashboard-card h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  color: #3f2f23;
+}
+
+.dashboard-card p {
+  color: #6d6258;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.search-form label {
+  display: block;
+  text-align: left;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.search-row {
+  display: flex;
+  gap: 10px;
+}
+
+.search-row input {
+  flex: 1;
+  padding: 14px;
+  border: 2px solid #f0c89d;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.search-row input:focus {
+  outline: none;
+  border-color: #d66b2f;
+}
+
+.search-row button {
+  background-color: #d66b2f;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.search-row button:hover {
+  background-color: #b95422;
+}
+
+@media (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .search-row {
+    flex-direction: column;
+  }
+
+  .dashboard-card {
+    padding: 25px;
+  }
+}

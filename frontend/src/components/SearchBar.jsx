@@ -20,17 +20,18 @@ function SearchBar(){
     };
 
     return (
-        <form onSubmit={handleFormSubmit}>
+        <form className="search-form" onSubmit={handleFormSubmit}>
             <label htmlFor="pantry-search">Enter an ingredient:</label>
-            
-            <input
-                id="pantry-search" 
-                type="text" 
-                placeholder="Enter ingredients..." 
-                value={searchTerm}      // bind input value to state variable
-                onChange={handleInputChange} //updates state when key is pressed
-            />
-            <button type="submit">Search</button>
+            <div className="search-row">
+                <input
+                    id="pantry-search" 
+                    type="text" 
+                    placeholder="Enter ingredients..." 
+                    value={searchTerm}      // bind input value to state variable
+                    onChange={handleInputChange} //updates state when key is pressed
+                />
+                <button type="submit">Search</button>
+            </div>
         </form>
     );
 }
