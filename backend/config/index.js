@@ -25,7 +25,7 @@ const edamamAccountUser = apiId; // Edamam uses the same value for app_id and Ed
 // const recipeReturnUrl = `${apiUrl}/${recipeId}?${recipeSearchParams.toString()}`;
 
 // Function to build ingredient search URL with query parameter
-function buildIngredientSearchUrl(query) {
+function buildIngredientSearchUrlWithQuery(query) {
   const params = new URLSearchParams({
     type: 'public',
     q: query,
@@ -37,9 +37,22 @@ function buildIngredientSearchUrl(query) {
   return `${apiUrl}?${params.toString()}`;
 }
 
+// Function to build ingredient search URL with recipe ID
+function buildIngredientSearchUrlWithRecipeId(recipeId) {
+  const params = new URLSearchParams({
+    type: 'public',
+    field: 'ingredients',
+    app_id: apiId,
+    app_key: apiKey
+  });
+
+  return `${apiUrl}/${recipeId}?${params.toString()}`;
+}
+
 module.exports = {
     port: process.env.PORT || 3000,
-    buildIngredientSearchUrl,
+    buildIngredientSearchUrlWithQuery,
+    buildIngredientSearchUrlWithRecipeId,
     // recipeSearchUrl,
     // ingredientSearchUrl: recipeReturnUrl,
     edamamAccountUser

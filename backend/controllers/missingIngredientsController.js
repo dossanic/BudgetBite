@@ -1,36 +1,44 @@
 const { fetchFromEdamam } = require('../services/edamamService');
-const { buildIngredientSearchUrl, edamamAccountUser } = require('../config');
+const { buildIngredientSearchUrlWithRecipeId, edamamAccountUser } = require('../config');
 
 // Fetch ingredients THAT DO NOT CONTAIN QUERY PARAMS from the Edamam API and return to the client
 // TODO: Fix rawIngredients not being array (or maybe frontend needs to add recipe ID?)
 async function getMissingIngredients(req, res) {
-    // Require query parameter and validate
-    const query = String(req.query?.q || '').trim().toLowerCase();
-    if (!query) {
-        return res.status(400).send('Missing query parameter: "?q=[ingredient]" is required');
+    // Require and validate recipe ID and query parameter(s)
+    const recipeId = String(req.query?.recipe_id || '').trim();
+    const ingredient_query = String(req.query?.q || '').trim().toLowerCase();
+    if (!ingredient_query || !recipeId) {
+        return res.status(400).send('Bad Request: use "/missing-ingredients?recipe_id=[recipeId]&q=[ingredients]"');
     }
 
     try {
         // Build URL and fetch data from Edamam API
-        const url = buildIngredientSearchUrl(query);
+        const url = buildIngredientSearchUrlWithRecipeId(recipeId);
         const data = await fetchFromEdamam(url, edamamAccountUser);
 
         // Require ingredients field in response
-        const rawIngredients = data.ingredients || data.recipe?.ingredients;
+        const rawIngredients = data.recipe?.ingredients;
         if (!Array.isArray(rawIngredients)) {
-            return res.status(500).send('Invalid response: object is not an array');
+            throw new TypeError (
+                'Invalid response: object is not an array\n' +
+                'data: ' + JSON.stringify(data, null, 2)
+            );
         }
 
-        // Filter out ingredients that contain the query term
-        const filteredIngredients = rawIngredients.filter(ingredient =>
-            !ingredient.food.text.toLowerCase().includes(query)
-        );
+        // Remove ingredients that contain the query term
+        // console.log('Raw ingredients:', rawIngredients);
+        const filteredIngredients = rawIngredients.filter(ingredient => {
+            const ingredientText = String(ingredient.text || '').toLowerCase();   
+            return !ingredientText.includes(ingredient_query);
+        });
 
-        // Return data to client
-        return res.json({ ...data, ingredients: filteredIngredients });
+        // Return ingredients list to client
+        return res.json({ ingredients: filteredIngredients });
 
     } catch (err) {
         console.error(err);
+        if (err instanceof TypeError)
+            return res.status(502).send(err.message);
         return res.status(500).send('Error fetching data because reasons');
     }
 }
