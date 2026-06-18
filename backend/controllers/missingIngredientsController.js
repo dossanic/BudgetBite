@@ -6,7 +6,7 @@ const { buildIngredientSearchUrlWithRecipeId, edamamAccountUser } = require('../
 async function getMissingIngredients(req, res) {
     // Require and validate recipe ID and query parameter(s)
     const recipeId = String(req.query?.recipe_id || '').trim(); // Edamam recipe ID
-    const ingredient_query = String(req.query?.q || '') // User inputted search term
+    let ingredient_query = String(req.query?.q || '') // User inputted search term
         .trim()
         .toLowerCase()
 
