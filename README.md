@@ -9,4 +9,7 @@ Run `npm start`
 ### Run backend
 Navigate to /backend\
 Run `npm start `
+### Routes for Ingredient Lists
+http://localhost:3000/recipes?q=\[ingredients\]\
+http://localhost:3000/missing-ingredients?recipe_id=\[recipeId\]&q=\[ingredients\]
 

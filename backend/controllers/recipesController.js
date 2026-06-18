@@ -1,10 +1,11 @@
 const { fetchFromEdamam } = require('../services/edamamService');
-const { recipeSearchUrl, edamamAccountUser } = require('../config');
+const { buildIngredientSearchUrlWithQuery, edamamAccountUser } = require('../config');
 
 // Fetch recipes from the Edamam API and return to the client
 async function getMultipleRecipes(req, res) {
     try {
-        const data = await fetchFromEdamam(recipeSearchUrl, edamamAccountUser);
+        const url = buildIngredientSearchUrlWithQuery(req.query.q);
+        const data = await fetchFromEdamam(url, edamamAccountUser);
         res.json(data);
     } catch (err) {
         console.error(err);
