@@ -1,37 +1,45 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
-// Header component
-function Header() {
+function Header({ user }) {
+    const navigate = useNavigate();
+
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        navigate('/login');
+    }
+
     return (
-
-        
         <header>
-            {/* webpage header */}
-            <div>
-                <h1>BudgetBite</h1>
-            </div>
 
-            {/* navigation links */}
+            <h1>BudgetBite</h1>
+
             <nav>
                 <ul>
-                    <li>
-                        <a href="#search">Find Recipes</a>
-                    </li>
-                    <li>
-                        <a href="#saved">Saved Recipes</a>
-                    </li>
+                    {user && (
+                        <>
+                            <li><Link to="/">Dashboard</Link></li>
+                        </>
+                    )}
+
+                    {!user && (
+                        <>
+                            <li><Link to="/login">Login</Link></li>
+                            <li><Link to="/signup">Sign Up</Link></li>
+                        </>
+                    )}
                 </ul>
             </nav>
 
-            {/* user will be able to login later */}
-            <div>
-                <span>Welcome, User</span>
-            </div>
-
+            {user && (
+                <button onClick={handleLogout}>
+                    Logout
+                </button>
+            )}
 
         </header>
     );
 }
 
-//allow other files to import Header
 export default Header;

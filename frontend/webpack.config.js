@@ -27,8 +27,9 @@ module.exports = {
   ],
   devServer: {
     static: './dist',
-    port: 3000,
+    port: 3001,
     open: true,
     hot: true,
+    historyApiFallback: true, // For React Router
   },
 };
