@@ -1,35 +1,37 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 function Signup() {
+    const navigate = useNavigate();
 
-    // Stores the information entered by the user
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // Creates a new account in Supabase
     async function handleSignup(e) {
         e.preventDefault();
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email: email.trim().toLowerCase(),
-            password,
+            password: password,
         });
 
         if (error) {
             alert(error.message);
-        } else {
-            alert('Account created successfully!');
+            return;
         }
+
+        console.log('Signup data:', data);
+
+        alert('Account created successfully! You can now log in.');
+        navigate('/login');
     }
 
     return (
         <main>
-
             <h2>Create Account</h2>
 
             <form onSubmit={handleSignup}>
-
                 <div>
                     <label>Email</label><br />
                     <input
@@ -37,6 +39,7 @@ function Signup() {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                     />
                 </div>
 
@@ -49,17 +52,15 @@ function Signup() {
                         placeholder="Create a password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
+                        minLength="6"
                     />
                 </div>
 
                 <br />
 
-                <button type="submit">
-                    Sign Up
-                </button>
-
+                <button type="submit">Sign Up</button>
             </form>
-
         </main>
     );
 }
