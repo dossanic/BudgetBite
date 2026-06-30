@@ -73,7 +73,7 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
   return (
     <div style={styles.container}>
       <form onSubmit={handleFormSubmit}>
-        <label htmlFor="pantry-search" style={styles.label}><strong>Add Kitchen Ingredients:</strong></label>
+        <label htmlFor="pantry-search" style={styles.label}><strong>Add Ingredients to your Pantry:</strong></label>
         <div style={styles.inputGroup}>
           <input
             id="pantry-search"
@@ -88,7 +88,7 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
       </form>
 
       <div style={{ margin: '20px 0' }}>
-        <h4 style={{ color: '#444', marginBottom: '10px' }}>Your Pantry List:</h4>
+        <h4 style={{ color: '#444', marginBottom: '10px' }}>Your Pantry:</h4>
         {pantryList.length === 0 ? (
           <p style={{ color: 'gray', fontStyle: 'italic' }}>Your pantry is empty.</p>
         ) : (

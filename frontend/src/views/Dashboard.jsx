@@ -65,8 +65,8 @@ function Dashboard() {
 
   return (
     <section style={styles.container}>
-      <h2 style={styles.heading}>BudgetBite Pantry Dashboard</h2>
-      
+      <h2 style={styles.heading}>Dashboard</h2>
+      <p>Welcome to your BudgetBite Dashboard! Manage your pantry and discover recipes based on ingredients you have on hand.</p>
       <SearchBar 
         pantryList={pantryList}
         onAddIngredient={addIngredient}
