@@ -29,11 +29,19 @@ function buildIngredientSearchUrlWithQuery(query) {
   const params = new URLSearchParams({
     type: 'public',
     q: query,
-    field: 'ingredients',
+    //field: 'ingredients',
     app_id: apiId,
     app_key: apiKey
   });
 
+  params.append('field', 'label');
+  params.append('field', 'image');
+  params.append('field', 'source');
+  params.append('field', 'url');
+  params.append('field', 'uri');
+  params.append('field', 'ingredients');
+  params.append('field', 'ingredientLines');
+  
   return `${apiUrl}?${params.toString()}`;
 }
 

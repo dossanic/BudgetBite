@@ -1,11 +1,19 @@
 // Dependencies
 const express = require("express");
+const cors = require("cors"); // Enable CORS for all routes
 const recipesRouter = require("./routes/recipes");
 const ingredientsRouter = require("./routes/ingredients");
 const missingIngredientsRouter = require("./routes/missingIngredients");
 const { port } = require("./config");
 
 const app = express();
+
+app.use(cors({
+  origin: "http://localhost:3001", // Allows frontend to connect
+  methods: ["GET", "POST"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Routes

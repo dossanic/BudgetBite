@@ -8,6 +8,7 @@ Run `npm start`
 ## Backend
 ### Run backend
 Navigate to /backend\
+Run `npm install cors `
 Run `npm start `
 ### Routes for Ingredient Lists
 http://localhost:3000/recipes?q=\[ingredients\]\

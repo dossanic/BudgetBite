@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:3000'; // Adjusted to backend server URL
 
 const extractRecipeId = (uri) => {
   if (!uri) return '';
@@ -48,7 +48,7 @@ const fetchRecipesWithBudgets = async (pantryList) => {
 
       if (missingIngredientsList.length > 0) {
         try {
-          const priceResponse = await fetch(`${API_BASE_URL}/ingredients/price-estimate`, {
+          const priceResponse = await fetch(`${API_BASE_URL}/ingredients/price`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ingredients: missingIngredientsList })
