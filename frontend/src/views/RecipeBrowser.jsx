@@ -5,52 +5,107 @@ const { fetchRecipesWithBudgets } = require('../services/apiService');
 function RecipeBrowser() {
   const [searchQuery, setSearchQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
+  const [allRecipes, setAllRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [activeQuery, setActiveQuery] = useState('recipes');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalHits, setTotalHits] = useState(0);
-  const [pageHistory, setPageHistory] = useState([]);
-  const [currentPageUrl, setCurrentPageUrl] = useState(null);
-  const [nextPageUrl, setNextPageUrl] = useState(null);
-  const pageSize = 10;
+  const [activeQuery, setActiveQuery] = useState('recipes'); // Default active query to 'recipes' for initial load
+  const [currentPage, setCurrentPage] = useState(1); // Track the current page number for pagination
+  const [totalPages, setTotalPages] = useState(1); // Track the total number of pages available for the current search query
+  const [totalHits, setTotalHits] = useState(0); // Track the total number of hits returned by the API for the current search query
+  const [pageHistory, setPageHistory] = useState([]); // Track the history of page URLs for navigating back to previous pages
+  const [currentPageUrl, setCurrentPageUrl] = useState(null); // Track the URL of the current page for API requests
+  const [nextPageUrl, setNextPageUrl] = useState(null); // Track the URL of the next page for API requests
+  const [sortMode, setSortMode] = useState('random'); // Track the current sort mode, defaulting to 'random' for initial load
+  const pageSize = 15; // Set a constant page size for pagination
 
+  // Use useEffect to fetch all recipes on initial component mount
   useEffect(() => {
-    handleGetAll();
+    handleInitialLoad();
   }, []);
 
+  // Handle input change for the search query
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  // Handle form submission for searching recipes based on the user's input query
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const trimmedQuery = searchQuery.trim();
+    const trimmedQuery = searchQuery.trim(); // Trim whitespace from the search query to avoid unnecessary API calls with empty or whitespace-only queries
     if (trimmedQuery) {
-      executeSearch(trimmedQuery, 1);
+      executeSearch(trimmedQuery, 1); // Execute search with the trimmed query and reset to page 1
     }
   };
 
-  const executeSearch = async (query, page = 1, pageUrl = null) => {
+  // Function to fetch recipes sorted alphabetically (A-Z) with pagination
+  const fetchAlphabetizedRecipes = async (query, page = 1) => {
+    const collectedRecipes = [];
+    let currentPage = 1;
+    let currentNextUrl = null;
+    const maxResults = 250;
+
+    // Loop to fetch recipes until the maximum number of results is reached or there are no more pages available
+    while (collectedRecipes.length < maxResults && (currentPage === 1 || currentNextUrl)) {
+      const pageResult = await fetchRecipesWithBudgets([query], {
+        page: currentPage,
+        pageSize: 15,
+        nextUrl: currentNextUrl,
+        sortMode: 'random'
+      });
+
+      // If no recipes are returned for the current page, break the loop to avoid unnecessary API calls
+      const pageRecipes = pageResult.recipes || [];
+      collectedRecipes.push(...pageRecipes);
+
+      // Update the next page URL for the next iteration of the loop
+      currentNextUrl = pageResult.pagination?.nextPageUrl || null;
+      if (!currentNextUrl) break;
+      currentPage += 1;
+    }
+
+    // Sort the collected recipes alphabetically by title and paginate the results based on the requested page and page size
+    const sortedRecipes = [...collectedRecipes].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    const startIndex = (page - 1) * pageSize;
+    const pagedRecipes = sortedRecipes.slice(startIndex, startIndex + pageSize);
+
+    // Return the paginated and sorted recipes along with pagination information
+    return {
+      recipes: pagedRecipes,
+      allRecipes: sortedRecipes,
+      pagination: {
+        page,
+        pageSize,
+        totalPages: Math.max(1, Math.ceil(sortedRecipes.length / pageSize)),
+        totalHits: sortedRecipes.length,
+        nextPageUrl: null
+      }
+    };
+  };
+
+  // Function to execute the search for recipes based on the provided query, page number, and optional page URL for pagination
+  const executeSearch = async (query, page = 1, pageUrl = null, requestedSortMode = sortMode) => {
     setLoading(true);
     setError(null);
-    setRecipes([]);
+    setRecipes([]); // Clear previous recipes before fetching new results
 
+    // Reset page history if starting a new search from the first page
     if (page === 1) {
       setPageHistory([]);
     }
 
     try {
-      const result = await fetchRecipesWithBudgets([query], { page, pageSize, nextUrl: pageUrl });
-      const alphabetized = (result.recipes || []).sort((a, b) => {
-        const titleA = (a.title || '').toLowerCase();
-        const titleB = (b.title || '').toLowerCase();
-        return titleA.localeCompare(titleB);
-      });
+      const shouldSortAlphabetically = requestedSortMode === 'az';
+      let result;
+      if (shouldSortAlphabetically) {
+        result = await fetchAlphabetizedRecipes(query, page);
+        setAllRecipes(result.allRecipes || []);
+      } else {
+        result = await fetchRecipesWithBudgets([query], { page, pageSize, nextUrl: pageUrl, sortMode });
+        setAllRecipes(result.recipes || []);
+      }
 
       setActiveQuery(query);
-      setRecipes(alphabetized);
+      setRecipes(result.recipes || []);
       setCurrentPage(result.pagination?.page || page);
       setTotalPages(result.pagination?.totalPages || 1);
       setTotalHits(result.pagination?.totalHits || 0);
@@ -64,21 +119,45 @@ function RecipeBrowser() {
     }
   };
 
+  // Handle the "Show All (A-Z)" button click to reset the search query and fetch all recipes
   const handleGetAll = () => {
     setSearchQuery('');
-    executeSearch('recipes', 1);
+    setSortMode('random');
+    executeSearch('recipes', 1, null, 'random');
   };
 
+  const handleInitialLoad = () => {
+    setSearchQuery('');
+    setSortMode('random');
+    executeSearch('recipes', 1, null, 'random');
+  };
+
+  const handleSortAlphabetically = () => {
+    setSortMode('az');
+    executeSearch(activeQuery || 'recipes', 1, null, 'az');
+  };
+
+  // Handle pagination when the user clicks on the "Next" or "Previous" buttons
   const handlePageChange = (nextPage) => {
     if (nextPage < 1 || nextPage > totalPages || nextPage === currentPage) return;
 
-    if (nextPage === currentPage + 1) {
+    if (sortMode === 'az') {
+      const startIndex = (nextPage - 1) * pageSize;
+      const pagedRecipes = allRecipes.slice(startIndex, startIndex + pageSize);
+      setRecipes(pagedRecipes);
+      setCurrentPage(nextPage);
+      return;
+    }
+
+    // Determine the appropriate page URL for the next page based on the current page and page history
+    if (nextPage === currentPage + 1) { // Handle going to the next page
       setPageHistory((prev) => [...prev, currentPageUrl]);
       executeSearch(activeQuery, nextPage, nextPageUrl);
       return;
     }
 
-    if (nextPage === currentPage - 1) {
+    // Handle going to a specific page (not just next or previous)
+    if (nextPage === currentPage - 1) { // Handle going back to the previous page
       const previousPageUrl = pageHistory[pageHistory.length - 1] || null;
       setPageHistory((prev) => prev.slice(0, -1));
       executeSearch(activeQuery, nextPage, previousPageUrl);
@@ -87,7 +166,6 @@ function RecipeBrowser() {
 
   const styles = {
     container: { padding: '30px', fontFamily: 'sans-serif', backgroundColor: '#fdfdfd', minHeight: '100vh' },
-    // 👇 Centers everything cleanly up to a comfortable 1200px max layout width
     contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
     heading: { color: '#333', borderBottom: '2px solid #fff3ee', paddingBottom: '10px', marginBottom: '20px' },
     actionsRow: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '30px', alignItems: 'center' },
@@ -185,7 +263,7 @@ function RecipeBrowser() {
             <button type="submit" style={styles.button}>Search</button>
           </form>
 
-          <button onClick={handleGetAll} style={styles.getAllButton}>
+          <button onClick={handleSortAlphabetically} style={styles.getAllButton}>
             Show All (A-Z)
           </button>
         </div>
@@ -195,7 +273,7 @@ function RecipeBrowser() {
 
         {!loading && recipes.length > 0 && (
           <>
-            <p style={styles.paginationInfo}>Showing {recipes.length} of {totalHits} recipes • Page {currentPage} of {totalPages}</p>
+            {/* <p style={styles.paginationInfo}>Showing {recipes.length} of {totalHits} recipes • Page {currentPage} of {totalPages}</p> */}
             <div style={styles.grid}>
               {recipes.map((recipe, index) => (
                 <div key={recipe.id || index} style={styles.card}>

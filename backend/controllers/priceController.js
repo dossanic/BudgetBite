@@ -1,32 +1,46 @@
 const supabase = require("../supabaseClient");
 const { estimatePrice } = require("../services/groqService");
 
-// Calculate min/max price for missing ingredients
+// Constants for Groq AI rate limiting
+const GROQ_COOLDOWN_MS = 5 * 60 * 1000;
+const groqCircuit = {
+  disabledUntil: 0,
+  consecutiveFailures: 0,
+};
+
+// Helper function to check if an error is related to Groq AI rate limiting
+function isGroqRateLimitError(error) {
+  const message = error?.message || "";
+  return /429|Too Many Requests|rate limit|quota/i.test(message);
+}
+
+// Function to get price estimates for a list of ingredients
 async function getPriceEstimate(req, res) {
   const { ingredients, location = "Toronto, Ontario" } = req.body; // Require an array of ingredient names and an optional location from the request body
 
-  // Validate user input, check if ingredients exist, ingredients is array, and array is not empty
   if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
-    // Return a status 400 for bad request
     return res.status(400).json({
-      error: "Please provide a list of ingredients", // An error message to inform about the issue
+      error: "Please provide a list of ingredients",
     });
   }
 
   // Loop through all ingredients name, delete white space and convert to lowercase to avoid case sensitivity
   // map function will return a new array with the normalized ingredient names, we will use this array to query the database
-  const normalizedIngredients = ingredients.map((name) =>
-    name.trim().toLowerCase(),
-  );
+  const normalizedIngredients = ingredients.map((name) => name.trim().toLowerCase());
 
-  // Query supabase database for the ingredients that match the normalized ingredient names
-  const { data, error } = await supabase
-    .from("ingredient_prices")
-    .select("name, price_min, price_max")
-    .in("name", normalizedIngredients);
-  // If error return 500 with error message
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  let data = [];
+  let supabaseError = null;
+
+  try {
+    const response = await supabase // Query supabase database for the ingredients that match the normalized ingredient names
+      .from("ingredient_prices")
+      .select("name, price_min, price_max")
+      .in("name", normalizedIngredients);
+
+    data = response.data || []; // If no data is returned, default to an empty array
+    supabaseError = response.error; // If there is an error, store it in supabaseError to handle it later
+  } catch (err) {
+    supabaseError = err;
   }
 
   // Initalize variables and array to store results
@@ -35,11 +49,16 @@ async function getPriceEstimate(req, res) {
   const found = [];
   const notFound = [];
 
-  // Create a loop through normalizedIngredients
-  for (const ingredient of normalizedIngredients) {
-    // Find the ingredient in the database response
-    // find function will return the first element in the array that match the condition, for this one
-    const match = data.find((row) => row.name === ingredient);
+  if (supabaseError) {
+    for (const ingredient of normalizedIngredients) {
+      notFound.push({
+        ingredient,
+        message: "Price lookup unavailable right now",
+      });
+    }
+  } else {
+    for (const ingredient of normalizedIngredients) {
+      const match = data.find((row) => row.name === ingredient);
 
     // If found the ingredient add the price to the total variables
     // Supabase will return price as string so we need to parse it to float for calculation
@@ -66,26 +85,48 @@ async function getPriceEstimate(req, res) {
 
   // If there are ingredients not found in database, estimate price with Groq AI
   if (notFound.length > 0) {
-    const notFoundName = notFound.map((item) => item.ingredient); // Get the name of the ingredients not in the database
-    const priceEstimates = await estimatePrice(notFoundName, location); // Call the Groq AI service and send the name and location to get the estimate
+    const now = Date.now();
 
-    // Loop through the priceEstimates and add the price to the total
-    for (const estimate of priceEstimates) {
-      totalMin += estimate.min;
-      totalMax += estimate.max;
+    if (now < groqCircuit.disabledUntil) {
+      for (const item of notFound) {
+        item.message = "Price estimation temporarily unavailable";
+      }
+    } else {
+      try {
+        const notFoundName = notFound.map((item) => item.ingredient);
+        const priceEstimates = await estimatePrice(notFoundName, location);
 
-      // Push the ingredient and price to the found array
-      found.push({
-        ingredient: estimate.ingredient,
-        min: estimate.min,
-        max: estimate.max,
-      });
+        for (const estimate of priceEstimates || []) {
+          totalMin += estimate.min;
+          totalMax += estimate.max;
+
+          found.push({
+            ingredient: estimate.ingredient,
+            min: estimate.min,
+            max: estimate.max,
+          });
+        }
+
+        notFound.length = 0;
+        groqCircuit.consecutiveFailures = 0;
+      } catch (err) {
+        groqCircuit.consecutiveFailures += 1;
+        const shouldDisable = isGroqRateLimitError(err) || groqCircuit.consecutiveFailures >= 3;
+
+        if (shouldDisable) {
+          groqCircuit.disabledUntil = Date.now() + GROQ_COOLDOWN_MS;
+          groqCircuit.consecutiveFailures = 0;
+        }
+
+        for (const item of notFound) {
+          item.message = isGroqRateLimitError(err)
+            ? "Price estimation temporarily unavailable"
+            : "Price estimate unavailable right now";
+        }
+      }
     }
-    // clear the notFound array after get all the estimate from Groq AI
-    notFound.length = 0;
   }
 
-  // Response to frontend
   return res.json({
     summary: {
       // Round to 2 decimal and parse the number to float
@@ -97,6 +138,7 @@ async function getPriceEstimate(req, res) {
     breakdown: found, // Breakdown the found ingredients with their price
     notFound,
   });
+}
 }
 
 module.exports = { getPriceEstimate };

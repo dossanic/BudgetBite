@@ -20,7 +20,7 @@ app.use(express.json());
 
 // Routes
 app.use("/recipes", recipesRouter);
-app.use("/price", require("./routes/price"));
+app.use("/ingredients/price", require("./routes/price"));
 app.use("/ingredients", ingredientsRouter); // Deprecated -- please use /missing-ingredients instead
 app.use("/missing-ingredients", missingIngredientsRouter);
 

@@ -17,8 +17,8 @@ function Dashboard() {
     setRecipes([]);
 
     try {
-      const result = await fetchRecipesWithBudgets(pantryList, { page: 1, pageSize: 10 });
-      setRecipes(result.recipes || []);
+      const result = await fetchRecipesWithBudgets(pantryList, { page: 1, pageSize: 10 }); // Fetch recipes based on the current pantry list with pagination options
+      setRecipes(result.recipes || []); // Update the recipes state with the fetched recipes, defaulting to an empty array if none are returned
     } catch (err) {
       console.error("Dashboard Pipeline Error:", err);
       setError(err.message);
@@ -29,7 +29,6 @@ function Dashboard() {
 
   const styles = {
     container: { padding: '30px', fontFamily: 'sans-serif', backgroundColor: '#fdfdfd', minHeight: '100vh' },
-    // 👇 Centers everything cleanly up to a comfortable 1200px max layout width
     contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
     heading: { color: '#333', borderBottom: '2px solid #fff3ee', paddingBottom: '10px' },
     loadingText: { color: '#ff6b35', fontWeight: 'bold', fontSize: '1.1em' },

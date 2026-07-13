@@ -15,9 +15,11 @@ async function getMultipleRecipes(req, res) {
         const safePageSize = Math.max(1, Number(pageSize) || 10);   // Ensure pageSize is at least 1
         const totalHits = data.count || 0;  // Total number of hits returned by the API
         const totalPages = Math.max(1, Math.ceil(totalHits / safePageSize));    // Calculate total pages based on total hits and pageSize
+        const limitedHits = Array.isArray(data.hits) ? data.hits.slice(0, safePageSize) : []; // Limit the hits to the requested pageSize
 
         res.json({  // Return the fetched data along with pagination information
             ...data,    // Spread the data returned from Edamam API
+            hits: limitedHits, // Limit the hits to the requested pageSize
             page: safePage, // Current page number
             pageSize: safePageSize, // Current page size
             totalPages, // Total number of pages
