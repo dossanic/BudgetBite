@@ -10,6 +10,7 @@ import Signup from './views/Signup';
 
 // Supabase client import
 import { supabase } from './services/supabaseClient';
+const { appStyles } = require('./appStyles');
 
 // Main App component
 function App() {
@@ -43,7 +44,7 @@ function App() {
   // Display a loading message while checking for an authenticated user
   if (loading) {
     return (
-      <div style={{ padding: '50px', fontFamily: 'sans-serif', textAlign: 'center', color: '#ff6b35' }}>
+      <div style={appStyles.loadingContainer}>
         <h3>Authenticating Session...</h3>
       </div>
     );
@@ -78,11 +79,11 @@ function App() {
 
                   {/* 3. Saved Recipes Page (Placeholder for Phase 5) */}
                   {currentView === 'saved' && (
-                    <div style={{ padding: '30px', fontFamily: 'sans-serif' }}>
-                      <h2 style={{ color: '#333', borderBottom: '2px solid #fff3ee', paddingBottom: '10px' }}>
+                    <div style={appStyles.savedViewContainer}>
+                      <h2 style={appStyles.savedViewHeading}>
                         Your Saved Collections
                       </h2>
-                      <p style={{ color: '#777', fontStyle: 'italic', marginTop: '20px' }}>
+                      <p style={appStyles.savedViewText}>
                         Coming soon!
                       </p>
                     </div>

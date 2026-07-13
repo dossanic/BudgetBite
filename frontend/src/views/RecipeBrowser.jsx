@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+const { DEFAULT_PAGE_SIZE, DEFAULT_SORT_MODE } = require('../constants');
+const { recipeBrowserStyles } = require('./recipeBrowserStyles');
 const { fetchRecipesWithBudgets } = require('../services/apiService');
 
 // RecipeBrowser component allows users to search for recipes and view them in a paginated format
@@ -15,8 +17,8 @@ function RecipeBrowser() {
   const [pageHistory, setPageHistory] = useState([]); // Track the history of page URLs for navigating back to previous pages
   const [currentPageUrl, setCurrentPageUrl] = useState(null); // Track the URL of the current page for API requests
   const [nextPageUrl, setNextPageUrl] = useState(null); // Track the URL of the next page for API requests
-  const [sortMode, setSortMode] = useState('random'); // Track the current sort mode, defaulting to 'random' for initial load
-  const pageSize = 15; // Set a constant page size for pagination
+  const [sortMode, setSortMode] = useState(DEFAULT_SORT_MODE); // Track the current sort mode, defaulting to the shared default
+  const pageSize = DEFAULT_PAGE_SIZE; // Use the shared default page size for pagination
 
   // Use useEffect to fetch all recipes on initial component mount
   useEffect(() => {
@@ -48,9 +50,9 @@ function RecipeBrowser() {
     while (collectedRecipes.length < maxResults && (currentPage === 1 || currentNextUrl)) {
       const pageResult = await fetchRecipesWithBudgets([query], {
         page: currentPage,
-        pageSize: 15,
+        pageSize: DEFAULT_PAGE_SIZE,
         nextUrl: currentNextUrl,
-        sortMode: 'random'
+        sortMode: DEFAULT_SORT_MODE
       });
 
       // If no recipes are returned for the current page, break the loop to avoid unnecessary API calls
@@ -122,14 +124,14 @@ function RecipeBrowser() {
   // Handle the "Show All (A-Z)" button click to reset the search query and fetch all recipes
   const handleGetAll = () => {
     setSearchQuery('');
-    setSortMode('random');
-    executeSearch('recipes', 1, null, 'random');
+    setSortMode(DEFAULT_SORT_MODE);
+    executeSearch('recipes', 1, null, DEFAULT_SORT_MODE);
   };
 
   const handleInitialLoad = () => {
     setSearchQuery('');
-    setSortMode('random');
-    executeSearch('recipes', 1, null, 'random');
+    setSortMode(DEFAULT_SORT_MODE);
+    executeSearch('recipes', 1, null, DEFAULT_SORT_MODE);
   };
 
   const handleSortAlphabetically = () => {
@@ -164,86 +166,7 @@ function RecipeBrowser() {
     }
   };
 
-  const styles = {
-    container: { padding: '30px', fontFamily: 'sans-serif', backgroundColor: '#fdfdfd', minHeight: '100vh' },
-    contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
-    heading: { color: '#333', borderBottom: '2px solid #fff3ee', paddingBottom: '10px', marginBottom: '20px' },
-    actionsRow: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '30px', alignItems: 'center' },
-    searchForm: { display: 'flex', gap: '10px', flexGrow: 1, maxWidth: '500px' },
-    input: {
-      padding: '12px',
-      fontSize: '1em',
-      borderRadius: '6px',
-      border: '1px solid #ffbb9e',
-      outline: 'none',
-      width: '100%'
-    },
-    button: {
-      padding: '12px 24px',
-      background: '#ff6b35',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '6px',
-      fontWeight: 'bold',
-      fontSize: '1em',
-      cursor: 'pointer',
-      whiteSpace: 'nowrap',
-      boxShadow: '0 4px 6px rgba(255, 107, 53, 0.1)'
-    },
-    getAllButton: {
-      padding: '12px 24px',
-      background: '#fff3ee',
-      color: '#ff6b35',
-      border: '2px solid #ff6b35',
-      borderRadius: '6px',
-      fontWeight: 'bold',
-      fontSize: '1em',
-      cursor: 'pointer',
-      whiteSpace: 'nowrap'
-    },
-    loadingText: { color: '#ff6b35', fontWeight: 'bold', fontSize: '1.1em' },
-    errorText: { color: '#d9381e', fontWeight: 'bold' },
-    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' },
-    card: {
-      border: '1px solid #fff3ee',
-      borderRadius: '12px',
-      padding: '16px',
-      backgroundColor: '#fff',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    image: { width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' },
-    title: { margin: '14px 0 6px 0', fontSize: '1.25em', color: '#333' },
-    source: { margin: '0 0 16px 0', color: '#777', fontSize: '0.9em' },
-    link: {
-      display: 'block',
-      textAlign: 'center',
-      marginTop: 'auto',
-      padding: '10px',
-      background: '#ff6b35',
-      color: '#fff',
-      textDecoration: 'none',
-      borderRadius: '6px',
-      fontWeight: 'bold',
-      fontSize: '0.95em'
-    },
-    pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', marginTop: '30px', flexWrap: 'wrap' },
-    paginationButton: {
-      padding: '10px 16px',
-      borderRadius: '6px',
-      border: '1px solid #ff6b35',
-      backgroundColor: '#fff',
-      color: '#ff6b35',
-      fontWeight: 'bold',
-      cursor: 'pointer'
-    },
-    paginationButtonDisabled: {
-      opacity: 0.5,
-      cursor: 'not-allowed'
-    },
-    paginationInfo: { color: '#555', fontWeight: 'bold' }
-  };
+  const styles = recipeBrowserStyles;
 
   return (
     <section style={styles.container}>
