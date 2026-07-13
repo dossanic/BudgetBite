@@ -6,34 +6,22 @@ const apiKey = process.env.API_KEY;
 const apiUrl = process.env.ENDPOINT_URL;
 const edamamAccountUser = apiId; // Edamam uses the same value for app_id and Edamam-Account-User
 
-// Query parameters for Recipe Search
-// const recipeSearchParams = new URLSearchParams({
-//     type: 'public',
-//     q: 'chicken',
-//     field: ['ingredients'],
-
-//     // Credentials
-//     app_id: apiId,
-//     app_key: apiKey
-// });
-
-// Recipe ID for ingredient search
-// const recipeId = 'fac0fed123103b648c8d6c46353cf8a5'; // Example recipe ID for ingredient search
-
-// Full API URL
-// const recipeSearchUrl = `${apiUrl}?${recipeSearchParams.toString()}`;
-// const recipeReturnUrl = `${apiUrl}/${recipeId}?${recipeSearchParams.toString()}`;
-
 // Function to build ingredient search URL with query parameter
-function buildIngredientSearchUrlWithQuery(query) {
+function buildIngredientSearchUrlWithQuery(query, page = 1, pageSize = 10) {  // Default to page 1 and pageSize 10 if not provided
+  const safePage = Math.max(1, Number(page) || 1); // Ensure page is at least 1
+  const safePageSize = Math.max(1, Number(pageSize) || 10); // Ensure pageSize is at least 1
+  const from = (safePage - 1) * safePageSize; // Calculate the starting index for pagination
+
   const params = new URLSearchParams({
     type: 'public',
-    q: query,
-    //field: 'ingredients',
+    q: query || 'recipes', // Default to 'recipes' if query is empty
     app_id: apiId,
-    app_key: apiKey
+    app_key: apiKey,
+    from: String(from), // Set the starting index for pagination
+    to: String(from + safePageSize) // Calculate the ending index for pagination
   });
 
+  // Specify the fields to retrieve from the API
   params.append('field', 'label');
   params.append('field', 'image');
   params.append('field', 'source');
@@ -42,7 +30,7 @@ function buildIngredientSearchUrlWithQuery(query) {
   params.append('field', 'ingredients');
   params.append('field', 'ingredientLines');
   
-  return `${apiUrl}?${params.toString()}`;
+  return `${apiUrl}?${params.toString()}`; // Return the full URL for the API request
 }
 
 // Function to build ingredient search URL with recipe ID

@@ -1,13 +1,31 @@
 const { fetchFromEdamam } = require('../services/edamamService');
 const { buildIngredientSearchUrlWithQuery, edamamAccountUser } = require('../config');
 
-// Fetch recipes from the Edamam API and return to the client
+// Function to get multiple recipes based on a query and pagination parameters
 async function getMultipleRecipes(req, res) {
     try {
-        const url = buildIngredientSearchUrlWithQuery(req.query.q);
-        const data = await fetchFromEdamam(url, edamamAccountUser);
-        res.json(data);
-    } catch (err) {
+        const page = req.query.page || 1;   // Default to page 1 if not provided
+        const pageSize = req.query.pageSize || 10;  // Default to pageSize 10 if not provided
+        const nextUrl = req.query.nextUrl ? decodeURIComponent(req.query.nextUrl) : null;
+        const url = nextUrl || buildIngredientSearchUrlWithQuery(req.query.q, page, pageSize); // Build the URL with query and pagination parameters
+        const data = await fetchFromEdamam(url, edamamAccountUser); // Fetch data from Edamam API
+
+        // Calculate total pages and total hits for pagination
+        const safePage = Math.max(1, Number(page) || 1); // Ensure page is at least 1
+        const safePageSize = Math.max(1, Number(pageSize) || 10);   // Ensure pageSize is at least 1
+        const totalHits = data.count || 0;  // Total number of hits returned by the API
+        const totalPages = Math.max(1, Math.ceil(totalHits / safePageSize));    // Calculate total pages based on total hits and pageSize
+
+        res.json({  // Return the fetched data along with pagination information
+            ...data,    // Spread the data returned from Edamam API
+            page: safePage, // Current page number
+            pageSize: safePageSize, // Current page size
+            totalPages, // Total number of pages
+            totalHits,   // Total number of hits
+            nextPageUrl: data._links?.next?.href || null
+        });
+        
+    } catch (err) { // Catch any errors that occur during the fetch process
         console.error(err);
         res.status(500).send('Error fetching data');
     }

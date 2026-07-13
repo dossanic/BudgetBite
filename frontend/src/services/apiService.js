@@ -6,12 +6,15 @@ const extractRecipeId = (uri) => {
   return parts.length > 1 ? parts[1] : '';
 };
 
-const fetchRecipesWithBudgets = async (pantryList) => {
-  if (!pantryList || pantryList.length === 0) return [];
+const fetchRecipesWithBudgets = async (pantryList, options = {}) => {
+  if (!pantryList || pantryList.length === 0) return { recipes: [], pagination: { page: 1, pageSize: 10, totalPages: 1, totalHits: 0 } };
 
   const combinedQuery = pantryList.join(',');
+  const page = options.page || 1;
+  const pageSize = options.pageSize || 10;
+  const nextUrl = options.nextUrl ? encodeURIComponent(options.nextUrl) : '';
 
-  const recipeResponse = await fetch(`${API_BASE_URL}/recipes?q=${encodeURIComponent(combinedQuery)}`);
+  const recipeResponse = await fetch(`${API_BASE_URL}/recipes?q=${encodeURIComponent(combinedQuery)}&page=${page}&pageSize=${pageSize}${nextUrl ? `&nextUrl=${nextUrl}` : ''}`);
   if (!recipeResponse.ok) throw new Error('Failed to fetch recipes from server.');
   
   const recipeData = await recipeResponse.json();
@@ -75,7 +78,16 @@ const fetchRecipesWithBudgets = async (pantryList) => {
     })
   );
 
-  return fullyProcessedRecipes;
+  return {
+    recipes: fullyProcessedRecipes,
+    pagination: {
+      page: recipeData.page || page,
+      pageSize: recipeData.pageSize || pageSize,
+      totalPages: recipeData.totalPages || 1,
+      totalHits: recipeData.totalHits || 0,
+      nextPageUrl: recipeData.nextPageUrl || null
+    }
+  };
 };
 
 module.exports = { fetchRecipesWithBudgets };

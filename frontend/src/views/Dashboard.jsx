@@ -17,8 +17,8 @@ function Dashboard() {
     setRecipes([]);
 
     try {
-      const data = await fetchRecipesWithBudgets(pantryList);
-      setRecipes(data);
+      const result = await fetchRecipesWithBudgets(pantryList, { page: 1, pageSize: 10 });
+      setRecipes(result.recipes || []);
     } catch (err) {
       console.error("Dashboard Pipeline Error:", err);
       setError(err.message);
