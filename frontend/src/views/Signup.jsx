@@ -7,6 +7,8 @@ const { theme } = require('../theme');
 function Signup() {
   const navigate = useNavigate();
 
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [uiError, setUiError] = useState(null);
@@ -20,6 +22,15 @@ function Signup() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password: password,
+      // These values are stored in Auth metadata and copied into public.users
+      // by the database trigger included with the profile migration.
+      options: {
+        data: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          name: `${firstName.trim()} ${lastName.trim()}`.trim()
+        }
+      }
     });
 
     if (error) {
@@ -150,6 +161,34 @@ function Signup() {
 
         <form onSubmit={handleSignup}>
           <div style={styles.inputGroup}>
+            <label style={styles.label}>First Name</label>
+            <input
+              type="text"
+              placeholder="Enter your first name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              style={styles.input}
+              className="bb-input"
+              autoComplete="given-name"
+              required
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Last Name</label>
+            <input
+              type="text"
+              placeholder="Enter your last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              style={styles.input}
+              className="bb-input"
+              autoComplete="family-name"
+              required
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
             <label style={styles.label}>Email Address</label>
             <input
               type="email"
@@ -158,6 +197,7 @@ function Signup() {
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
               className="bb-input"
+              autoComplete="email"
               required
             />
           </div>
@@ -171,6 +211,7 @@ function Signup() {
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
               className="bb-input"
+              autoComplete="new-password"
               required
               minLength="6"
             />

@@ -54,6 +54,15 @@ function Header({ setView, user }) {
       color: theme.color.textMuted,
       fontWeight: '500'
     },
+    profileBtn: {
+      background: 'none',
+      border: 'none',
+      color: theme.color.primary,
+      fontWeight: '700',
+      cursor: 'pointer',
+      padding: 0,
+      fontSize: '0.95em'
+    },
     logoutBtn: {
       background: theme.color.primary,
       color: theme.color.white,
@@ -105,8 +114,19 @@ function Header({ setView, user }) {
 
         {/* User Session Metadata & Actions Section */}
         <div style={styles.userSection}>
-          {/* Dynamically reads user email from the passed Supabase auth token session */}
-          <span>Welcome, {user?.email || "User"}</span>
+          {/* Prefer the saved first name, then fall back to the Auth email. */}
+          <span>
+            Welcome, {user?.user_metadata?.first_name || user?.email || "User"}
+          </span>
+
+          {/* Opens account details without changing the browser route. */}
+          <button
+            onClick={() => setView('profile')}
+            style={styles.profileBtn}
+            className="bb-text-link"
+          >
+            Profile
+          </button>
           
           {/* Logout action button */}
           <button onClick={handleLogout} style={styles.logoutBtn} className="bb-btn-primary">
