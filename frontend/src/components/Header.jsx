@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Used to programmatically redirect users post-authentication events
 const { supabase } = require('../services/supabaseClient'); // Supabase client wrapper containing initialized instance configs
+const { theme } = require('../theme');
 
 // setView
 function Header({ setView, user }) {
@@ -14,12 +15,10 @@ function Header({ setView, user }) {
 
   const styles = {
     header: {
-      background: '#fff3ee',
-      borderBottom: '2px solid #ff6b35',
-      fontFamily: 'sans-serif',
+      background: theme.color.primaryLight,
+      borderBottom: `2px solid ${theme.color.primary}`,
       padding: '15px 30px',
-      width: '100%',
-      boxSizing: 'border-box'
+      width: '100%'
     },
     // Centers header items and matches the 1200px max width of your dashboard
     contentWrapper: {
@@ -30,13 +29,13 @@ function Header({ setView, user }) {
       alignItems: 'center',
       width: '100%'
     },
-    logo: { 
-      color: '#ff6b35', 
-      margin: 0, 
-      fontSize: '1.8em', 
-      fontWeight: 'bold', 
+    logo: {
+      color: theme.color.primary,
+      margin: 0,
+      fontSize: '1.8em',
+      fontWeight: 'bold',
       cursor: 'pointer',
-      userSelect: 'none'  
+      userSelect: 'none'
     },
     navList: { display: 'flex', listStyle: 'none', gap: '20px', margin: 0, padding: 0 },
     navLink: {
@@ -46,26 +45,24 @@ function Header({ setView, user }) {
       fontWeight: '600',
       fontSize: '1em',
       cursor: 'pointer',
-      padding: 0,
-      fontFamily: 'sans-serif'
+      padding: 0
     },
-    userSection: { 
+    userSection: {
       display: 'flex',
       alignItems: 'center',
       gap: '15px',
-      color: '#666', 
-      fontWeight: '500' 
+      color: theme.color.textMuted,
+      fontWeight: '500'
     },
     logoutBtn: {
-      background: '#ff6b35',
-      color: '#fff',
+      background: theme.color.primary,
+      color: theme.color.white,
       border: 'none',
       padding: '6px 12px',
-      borderRadius: '4px',
+      borderRadius: theme.radius.sm,
       fontWeight: 'bold',
       cursor: 'pointer',
-      fontSize: '0.9em',
-      fontFamily: 'sans-serif'
+      fontSize: '0.9em'
     }
   };
 
@@ -76,7 +73,7 @@ function Header({ setView, user }) {
         {/* Brand Title / Clicking returns home */}
         <div>
           <h1 style={styles.logo} onClick={() => setView('dashboard')}>
-            BudgetBite
+            CheapChomp
           </h1>
         </div>
 
@@ -85,21 +82,21 @@ function Header({ setView, user }) {
           <ul style={styles.navList}>
             {/* Dashboard / Homepage */}
             <li>
-              <button onClick={() => setView('dashboard')} style={styles.navLink}>
+              <button onClick={() => setView('dashboard')} style={styles.navLink} className="bb-nav-link">
                 Home
               </button>
             </li>
-            
+
             {/* 2. Recipe Browser */}
             <li>
-              <button onClick={() => setView('browser')} style={styles.navLink}>
+              <button onClick={() => setView('browser')} style={styles.navLink} className="bb-nav-link">
                 Recipes
               </button>
             </li>
-            
+
             {/* 3. Saved Recipes Page */}
             <li>
-              <button onClick={() => setView('saved')} style={styles.navLink}>
+              <button onClick={() => setView('saved')} style={styles.navLink} className="bb-nav-link">
                 Saved
               </button>
             </li>
@@ -112,7 +109,7 @@ function Header({ setView, user }) {
           <span>Welcome, {user?.email || "User"}</span>
           
           {/* Logout action button */}
-          <button onClick={handleLogout} style={styles.logoutBtn}>
+          <button onClick={handleLogout} style={styles.logoutBtn} className="bb-btn-primary">
             Logout
           </button>
         </div>

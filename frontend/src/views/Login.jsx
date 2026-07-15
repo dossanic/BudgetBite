@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // Added Link for switching to signup
 const { supabase } = require('../services/supabaseClient');
+const { theme } = require('../theme');
 
 function Login() {
   const navigate = useNavigate();
@@ -37,28 +38,26 @@ function Login() {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '80vh',
-      fontFamily: 'sans-serif',
-      backgroundColor: '#fdfdfd',
       padding: '20px'
     },
     card: {
       width: '100%',
       maxWidth: '400px',
-      backgroundColor: '#fff',
+      backgroundColor: theme.color.white,
       padding: '40px 30px',
-      borderRadius: '12px',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-      border: '1px solid #fff3ee'
+      borderRadius: theme.radius.lg,
+      boxShadow: theme.shadow.panel,
+      border: `1px solid ${theme.color.border}`
     },
     title: {
-      color: '#ff6b35',
+      color: theme.color.primary,
       margin: '0 0 8px 0',
       fontSize: '2.2em',
       fontWeight: 'bold',
       textAlign: 'center'
     },
     subtitle: {
-      color: '#666',
+      color: theme.color.textMuted,
       textAlign: 'center',
       margin: '0 0 30px 0',
       fontSize: '0.95em'
@@ -77,32 +76,30 @@ function Login() {
       width: '100%',
       padding: '12px',
       fontSize: '1em',
-      borderRadius: '6px',
-      border: '1px solid #ffbb9e',
+      borderRadius: theme.radius.sm,
+      border: `1px solid ${theme.color.primaryBorder}`,
       outline: 'none',
-      boxSizing: 'border-box',
-      backgroundColor: '#fafafa',
-      transition: 'border 0.2s'
+      backgroundColor: theme.color.inputBg
     },
     submitBtn: {
       width: '100%',
       padding: '14px',
-      background: '#ff6b35',
-      color: '#fff',
+      background: theme.color.primary,
+      color: theme.color.white,
       border: 'none',
-      borderRadius: '6px',
+      borderRadius: theme.radius.sm,
       fontWeight: 'bold',
       fontSize: '1.05em',
       cursor: 'pointer',
       marginTop: '10px',
-      boxShadow: '0 4px 10px rgba(255, 107, 53, 0.2)'
+      boxShadow: theme.shadow.button
     },
     errorBox: {
-      backgroundColor: '#fdf2f0',
-      border: '1px solid #ffccd5',
-      color: '#d9381e',
+      backgroundColor: theme.color.dangerBg,
+      border: `1px solid ${theme.color.dangerBorder}`,
+      color: theme.color.danger,
       padding: '12px',
-      borderRadius: '6px',
+      borderRadius: theme.radius.sm,
       marginBottom: '20px',
       fontSize: '0.9em',
       fontWeight: '500',
@@ -112,10 +109,10 @@ function Login() {
       textAlign: 'center',
       marginTop: '25px',
       fontSize: '0.9em',
-      color: '#666'
+      color: theme.color.textMuted
     },
     signupLink: {
-      color: '#ff6b35',
+      color: theme.color.primary,
       textDecoration: 'none',
       fontWeight: 'bold',
       marginLeft: '5px'
@@ -140,6 +137,7 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
+              className="bb-input"
               required
             />
           </div>
@@ -152,18 +150,19 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
+              className="bb-input"
               required
             />
           </div>
 
-          <button type="submit" style={styles.submitBtn}>
+          <button type="submit" style={styles.submitBtn} className="bb-btn-primary">
             Log In
           </button>
         </form>
 
         <p style={styles.footerText}>
-          Don't have an account? 
-          <Link to="/signup" style={styles.signupLink}>Sign Up</Link>
+          Don't have an account?
+          <Link to="/signup" style={styles.signupLink} className="bb-text-link">Sign Up</Link>
         </p>
       </main>
     </div>

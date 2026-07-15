@@ -35,14 +35,16 @@ function Dashboard() {
       {/* 👇 Added centering layout node */}
       <div style={styles.contentWrapper}>
         <h2 style={styles.heading}>Dashboard</h2>
-        <p>Welcome to your BudgetBite Dashboard! Manage your pantry and discover recipes based on ingredients you have on hand.</p>
-        
-        <SearchBar 
-          pantryList={pantryList}
-          onAddIngredient={addIngredient}
-          onRemoveIngredient={removeIngredient}
-          onTriggerSearch={handlePantryRecipeSearch}
-        />
+        <p style={styles.subtitle}>Welcome to your CheapChomp Dashboard! Manage your pantry and discover recipes based on ingredients you have on hand.</p>
+
+        <div style={styles.panel}>
+          <SearchBar
+            pantryList={pantryList}
+            onAddIngredient={addIngredient}
+            onRemoveIngredient={removeIngredient}
+            onTriggerSearch={handlePantryRecipeSearch}
+          />
+        </div>
 
         {loading && <p style={styles.loadingText}>🍊 Loading Recipes...</p>}
         {error && <p style={styles.errorText}>Error: {error}</p>}
@@ -53,13 +55,13 @@ function Dashboard() {
             
             <div style={styles.grid}>
               {recipes.map((recipe, index) => (
-                <div key={recipe.id || index} style={styles.card}>
+                <div key={recipe.id || index} style={styles.card} className="bb-card">
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
                   <h4 style={styles.recipeTitle}>{recipe.title || "Untitled Recipe"}</h4>
                   <p style={styles.recipeSource}>Source: <em>{recipe.source || "Unknown Source"}</em></p>
-                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.recipeLink}>
+                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.recipeLink} className="bb-link">
                     View Full Recipe Instructions
                   </a>
                 </div>

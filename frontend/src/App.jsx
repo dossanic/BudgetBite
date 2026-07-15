@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // view imports
 import Header from './components/Header';
+import Footer from './components/Footer';
 import Dashboard from './views/Dashboard';
 import RecipeBrowser from './views/RecipeBrowser';
 import Login from './views/Login';
@@ -89,6 +90,8 @@ function App() {
                     </div>
                   )}
                 </main>
+
+                <Footer setView={setCurrentView} />
               </div>
             ) : (
               <Navigate to="/login" replace />

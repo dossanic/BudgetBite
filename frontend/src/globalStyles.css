@@ -1,0 +1,99 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #fdfdfd;
+  color: #2b2b2b;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Inline styles can't express :hover/:focus, so interactive states live here.
+   Hex values are duplicated from src/theme.js on purpose (CSS can't import JS) — keep them in sync. */
+
+.bb-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.bb-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+.bb-btn-primary {
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.08s ease;
+}
+.bb-btn-primary:hover {
+  background-color: #eb5a26;
+}
+.bb-btn-primary:active {
+  transform: translateY(1px);
+}
+
+.bb-btn-outline {
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.bb-btn-outline:hover {
+  background-color: #ffe4d6;
+}
+
+.bb-link {
+  transition: background-color 0.18s ease;
+}
+.bb-link:hover {
+  background-color: #eb5a26;
+}
+
+.bb-text-link {
+  transition: opacity 0.18s ease;
+}
+.bb-text-link:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
+.bb-input {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.bb-input:focus {
+  border-color: #ff6b35;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.14);
+}
+
+.bb-nav-link {
+  transition: color 0.18s ease;
+}
+.bb-nav-link:hover {
+  color: #ff6b35;
+}
+
+.bb-pagination-btn {
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+.bb-pagination-btn:hover:not(:disabled) {
+  background-color: #fff3ee;
+}
+
+.bb-remove-btn {
+  transition: color 0.18s ease, transform 0.12s ease;
+}
+.bb-remove-btn:hover {
+  color: #d9381e;
+  transform: scale(1.15);
+}
+
+.bb-badge {
+  transition: transform 0.12s ease;
+}
+.bb-badge:hover {
+  transform: translateY(-1px);
+}

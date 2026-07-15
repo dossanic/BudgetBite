@@ -1,38 +1,48 @@
+const { theme } = require('../theme');
+
 const dashboardStyles = {
-  container: { padding: '30px', fontFamily: 'sans-serif', backgroundColor: '#fdfdfd', minHeight: '100vh' },
+  container: { padding: '30px', backgroundColor: theme.color.background, minHeight: '100vh' },
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
-  heading: { color: '#333', borderBottom: '2px solid #fff3ee', paddingBottom: '10px' },
-  loadingText: { color: '#ff6b35', fontWeight: 'bold', fontSize: '1.1em' },
-  errorText: { color: '#d9381e', fontWeight: 'bold' },
+  heading: { color: theme.color.text, borderBottom: `2px solid ${theme.color.border}`, paddingBottom: '10px', marginBottom: '20px' },
+  subtitle: { color: theme.color.textMuted, fontSize: '1.05em', lineHeight: '1.5', maxWidth: '640px', margin: '0 0 25px 0' },
+  panel: {
+    backgroundColor: theme.color.white,
+    border: `1px solid ${theme.color.border}`,
+    borderRadius: theme.radius.lg,
+    boxShadow: theme.shadow.panel,
+    padding: '28px',
+    marginBottom: '10px'
+  },
+  loadingText: { color: theme.color.primary, fontWeight: 'bold', fontSize: '1.1em' },
+  errorText: { color: theme.color.danger, fontWeight: 'bold' },
   gridSection: { marginTop: '40px' },
   gridTitle: { color: '#222', fontSize: '1.5em', marginBottom: '15px' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' },
   card: {
-    border: '1px solid #fff3ee',
-    borderRadius: '12px',
+    border: `1px solid ${theme.color.border}`,
+    borderRadius: theme.radius.lg,
     padding: '16px',
-    backgroundColor: '#fff',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+    backgroundColor: theme.color.white,
+    boxShadow: theme.shadow.card,
     display: 'flex',
-    flexDirection: 'column',
-    transition: 'transform 0.2s'
+    flexDirection: 'column'
   },
-  image: { width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' },
-  recipeTitle: { margin: '14px 0 6px 0', fontSize: '1.25em', color: '#333' },
-  recipeSource: { margin: '0 0 16px 0', color: '#777', fontSize: '0.9em' },
+  image: { width: '100%', height: '200px', objectFit: 'cover', borderRadius: theme.radius.md },
+  recipeTitle: { margin: '14px 0 6px 0', fontSize: '1.25em', color: theme.color.text },
+  recipeSource: { margin: '0 0 16px 0', color: theme.color.textMuted, fontSize: '0.9em' },
   recipeLink: {
     display: 'block',
     textAlign: 'center',
     marginTop: 'auto',
     padding: '10px',
-    background: '#ff6b35',
-    color: '#fff',
+    background: theme.color.primary,
+    color: theme.color.white,
     textDecoration: 'none',
-    borderRadius: '6px',
+    borderRadius: theme.radius.sm,
     fontWeight: 'bold',
     fontSize: '0.95em'
   },
-  placeholder: { color: '#888', marginTop: '25px', fontStyle: 'italic' }
+  placeholder: { color: theme.color.textFaint, marginTop: '25px', fontStyle: 'italic' }
 };
 
 module.exports = { dashboardStyles };

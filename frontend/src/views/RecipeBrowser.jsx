@@ -182,11 +182,12 @@ function RecipeBrowser() {
               value={searchQuery}
               onChange={handleInputChange}
               style={styles.input}
+              className="bb-input"
             />
-            <button type="submit" style={styles.button}>Search</button>
+            <button type="submit" style={styles.button} className="bb-btn-primary">Search</button>
           </form>
 
-          <button onClick={handleSortAlphabetically} style={styles.getAllButton}>
+          <button onClick={handleSortAlphabetically} style={styles.getAllButton} className="bb-btn-outline">
             Show All (A-Z)
           </button>
         </div>
@@ -199,13 +200,13 @@ function RecipeBrowser() {
             {/* <p style={styles.paginationInfo}>Showing {recipes.length} of {totalHits} recipes • Page {currentPage} of {totalPages}</p> */}
             <div style={styles.grid}>
               {recipes.map((recipe, index) => (
-                <div key={recipe.id || index} style={styles.card}>
+                <div key={recipe.id || index} style={styles.card} className="bb-card">
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
                   <h4 style={styles.title}>{recipe.title || "Untitled Recipe"}</h4>
                   <p style={styles.source}>Source: <em>{recipe.source || "Unknown Source"}</em></p>
-                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
+                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.link} className="bb-link">
                     View Full Recipe Instructions
                   </a>
                 </div>
@@ -220,6 +221,7 @@ function RecipeBrowser() {
                   ...styles.paginationButton,
                   ...(currentPage <= 1 ? styles.paginationButtonDisabled : {})
                 }}
+                className="bb-pagination-btn"
               >
                 Previous
               </button>
@@ -231,6 +233,7 @@ function RecipeBrowser() {
                   ...styles.paginationButton,
                   ...(currentPage >= totalPages ? styles.paginationButtonDisabled : {})
                 }}
+                className="bb-pagination-btn"
               >
                 Next
               </button>

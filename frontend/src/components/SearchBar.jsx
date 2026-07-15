@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+const { theme } = require('../theme');
 
 function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerSearch }){
   const [inputValue, setInputValue] = useState('');
@@ -15,33 +16,44 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
   };
 
   const styles = {
-    container: { margin: '20px 0', fontFamily: 'sans-serif' },
-    label: { color: '#333', fontSize: '1.1em' },
+    container: {},
+    label: { color: theme.color.text, fontSize: '1.1em' },
     inputGroup: { display: 'flex', gap: '8px', margin: '10px 0' },
     input: {
       padding: '10px',
       fontSize: '1em',
-      borderRadius: '6px',
-      border: '1px solid #ffbb9e',
+      borderRadius: theme.radius.sm,
+      border: `1px solid ${theme.color.primaryBorder}`,
       outline: 'none',
       width: '100%',
       maxWidth: '300px'
     },
     addButton: {
       padding: '10px 20px',
-      background: '#ff6b35',
-      color: '#fff',
+      background: theme.color.primary,
+      color: theme.color.white,
       border: 'none',
-      borderRadius: '6px',
+      borderRadius: theme.radius.sm,
       fontWeight: 'bold',
       cursor: 'pointer'
     },
+    pantrySection: { margin: '20px 0' },
+    pantryHeading: { color: '#444', marginBottom: '10px' },
+    pantryEmpty: {
+      color: theme.color.textMuted,
+      textAlign: 'center',
+      padding: '20px',
+      border: `1px dashed ${theme.color.primaryBorder}`,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.color.primaryLight
+    },
+    pantryList: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
     badge: {
-      background: '#ffe4d6',
-      border: '1px solid #ffbb9e',
+      background: theme.color.primarySoft,
+      border: `1px solid ${theme.color.primaryBorder}`,
       color: '#d94814',
       padding: '6px 12px',
-      borderRadius: '20px',
+      borderRadius: theme.radius.pill,
       display: 'inline-flex',
       alignItems: 'center',
       fontWeight: '600',
@@ -51,7 +63,7 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
       marginLeft: '8px',
       background: 'none',
       border: 'none',
-      color: '#ff6b35',
+      color: theme.color.primary,
       fontWeight: 'bold',
       cursor: 'pointer',
       fontSize: '1.1em'
@@ -59,14 +71,14 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
     searchBtn: {
       margin: '15px 0',
       padding: '12px 24px',
-      background: '#ff6b35',
-      color: '#fff',
+      background: theme.color.primary,
+      color: theme.color.white,
       border: 'none',
-      borderRadius: '6px',
+      borderRadius: theme.radius.sm,
       fontWeight: 'bold',
       fontSize: '1em',
       cursor: 'pointer',
-      boxShadow: '0 4px 6px rgba(255, 107, 53, 0.2)'
+      boxShadow: theme.shadow.button
     }
   };
 
@@ -82,21 +94,22 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
             value={inputValue}
             onChange={handleInputChange}
             style={styles.input}
+            className="bb-input"
           />
-          <button type="submit" style={styles.addButton}>Add</button>
+          <button type="submit" style={styles.addButton} className="bb-btn-primary">Add</button>
         </div>
       </form>
 
-      <div style={{ margin: '20px 0' }}>
-        <h4 style={{ color: '#444', marginBottom: '10px' }}>Your Pantry:</h4>
+      <div style={styles.pantrySection}>
+        <h4 style={styles.pantryHeading}>Your Pantry:</h4>
         {pantryList.length === 0 ? (
-          <p style={{ color: 'gray', fontStyle: 'italic' }}>Your pantry is empty.</p>
+          <p style={styles.pantryEmpty}>Add an ingredient above to start building your pantry.</p>
         ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={styles.pantryList}>
             {pantryList.map((ingredient, index) => (
-              <span key={index} style={styles.badge}>
+              <span key={index} style={styles.badge} className="bb-badge">
                 {ingredient}
-                <button onClick={() => onRemoveIngredient(ingredient)} style={styles.removeBtn}>✕</button>
+                <button onClick={() => onRemoveIngredient(ingredient)} style={styles.removeBtn} className="bb-remove-btn">✕</button>
               </span>
             ))}
           </div>
@@ -104,7 +117,7 @@ function SearchBar({ onAddIngredient, pantryList, onRemoveIngredient, onTriggerS
       </div>
 
       {pantryList.length > 0 && (
-        <button onClick={onTriggerSearch} style={styles.searchBtn}>
+        <button onClick={onTriggerSearch} style={styles.searchBtn} className="bb-btn-primary">
           Find Recipes Matching My Pantry
         </button>
       )}
