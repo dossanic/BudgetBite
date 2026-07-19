@@ -8,6 +8,7 @@ import Dashboard from './views/Dashboard';
 import RecipeBrowser from './views/RecipeBrowser';
 import Login from './views/Login';
 import Signup from './views/Signup';
+import InformationPage from './views/InformationPage';
 
 // Supabase client import
 import { supabase } from './services/supabaseClient';
@@ -17,7 +18,11 @@ const { appStyles } = require('./appStyles');
 function App() {
   const [user, setUser] = useState(null); // State to track the authenticated user
   const [loading, setLoading] = useState(true); // State to track the loading status of the authentication check
-  const [currentView, setCurrentView] = useState('dashboard');  // State to track the current view in the app (dashboard, browser, saved)
+  const [currentView, setCurrentView] = useState('dashboard');  // Tracks the selected application or footer view
+
+  // Footer information pages share one reusable layout and use this key to
+  // select their content inside InformationPage.
+  const informationViews = ['about', 'goals', 'privacy', 'safety', 'credits'];
   
   // Effect hook to check for an authenticated user on component mount
   useEffect(() => {
@@ -88,6 +93,11 @@ function App() {
                         Coming soon!
                       </p>
                     </div>
+                  )}
+
+                  {/* 4. Informational pages opened from the footer */}
+                  {informationViews.includes(currentView) && (
+                    <InformationPage page={currentView} setView={setCurrentView} />
                   )}
                 </main>
 
