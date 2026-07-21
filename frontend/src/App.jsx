@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 // view imports
 import Header from './components/Header';
 import Footer from './components/Footer';
+import BackgroundPeaches from './components/BackgroundPeaches';
 import Dashboard from './views/Dashboard';
 import RecipeBrowser from './views/RecipeBrowser';
+import RecipeDetails from './views/RecipeDetails';
 import Login from './views/Login';
 import Signup from './views/Signup';
 
@@ -13,12 +15,37 @@ import Signup from './views/Signup';
 import { supabase } from './services/supabaseClient';
 const { appStyles } = require('./appStyles');
 
+// Wraps the authenticated app's pages with the shared Header/Footer chrome
+function AppShell({ user }) {
+  return (
+    <div>
+      <Header user={user} />
+      <div style={{ position: 'relative', zIndex: 0 }}>
+        <BackgroundPeaches />
+        <main>
+          <Outlet />
+        </main>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+// Placeholder for the Saved Recipes page (Phase 5)
+function SavedPlaceholder() {
+  return (
+    <div style={appStyles.savedViewContainer}>
+      <h2 style={appStyles.savedViewHeading}>Your Saved Collections</h2>
+      <p style={appStyles.savedViewText}>Coming soon!</p>
+    </div>
+  );
+}
+
 // Main App component
 function App() {
   const [user, setUser] = useState(null); // State to track the authenticated user
   const [loading, setLoading] = useState(true); // State to track the loading status of the authentication check
-  const [currentView, setCurrentView] = useState('dashboard');  // State to track the current view in the app (dashboard, browser, saved)
-  
+
   // Effect hook to check for an authenticated user on component mount
   useEffect(() => {
     async function getUser() {  // Async function to fetch the current authenticated user from Supabase
@@ -55,49 +82,30 @@ function App() {
     <BrowserRouter> {/* Wrap the app in BrowserRouter to enable routing */}
       <Routes>  {/* Define the routes for the application */}
         <Route // Public Routes for Login and Signup
-          path="/login" 
+          path="/login"
           element={!user ? <Login /> : <Navigate to="/" replace />} // If the user is not authenticated, render the Login component; otherwise, redirect to the root path
         />
-        <Route 
+        <Route
           path="/signup" // Public route for the signup page
           element={!user ? <Signup /> : <Navigate to="/" replace />} // If the user is not authenticated, render the Signup component; otherwise, redirect to the root path
         />
 
         <Route
           path="/"
-          element={
-            user ? (
-              <div>
-                {/* Pass the state setter down to your updated Header */}
-                <Header setView={setCurrentView} user={user} />
-                
-                <main>
-                  {/* 1. Pantry Dashboard (Homepage) */}
-                  {currentView === 'dashboard' && <Dashboard />}
-                  
-                  {/* 2. Global Edamam Recipe Browser */}
-                  {currentView === 'browser' && <RecipeBrowser />}
+          element={user ? <AppShell user={user} /> : <Navigate to="/login" replace />}
+        >
+          {/* 1. Pantry Dashboard (Homepage) */}
+          <Route index element={<Dashboard />} />
 
-                  {/* 3. Saved Recipes Page (Placeholder for Phase 5) */}
-                  {currentView === 'saved' && (
-                    <div style={appStyles.savedViewContainer}>
-                      <h2 style={appStyles.savedViewHeading}>
-                        Your Saved Collections
-                      </h2>
-                      <p style={appStyles.savedViewText}>
-                        Coming soon!
-                      </p>
-                    </div>
-                  )}
-                </main>
+          {/* 2. Global Edamam Recipe Browser */}
+          <Route path="recipes" element={<RecipeBrowser />} />
 
-                <Footer setView={setCurrentView} />
-              </div>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+          {/* 3. Recipe Details Page */}
+          <Route path="recipes/:id" element={<RecipeDetails />} />
+
+          {/* 4. Saved Recipes Page (Placeholder for Phase 5) */}
+          <Route path="saved" element={<SavedPlaceholder />} />
+        </Route>
 
         {/* Catch-all fallback path back to root */}
         <Route path="*" element={<Navigate to="/" replace />} />

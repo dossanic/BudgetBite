@@ -1,6 +1,7 @@
 // src/views/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // Added Link for switching to signup
+import BackgroundPeaches from '../components/BackgroundPeaches';
 const { supabase } = require('../services/supabaseClient');
 const { theme } = require('../theme');
 
@@ -34,6 +35,8 @@ function Login() {
 
   const styles = {
     wrapper: {
+      position: 'relative',
+      zIndex: 0,
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -121,6 +124,7 @@ function Login() {
 
   return (
     <div style={styles.wrapper}>
+      <BackgroundPeaches />
       <main style={styles.card}>
         <h2 style={styles.title}>Welcome</h2>
         <p style={styles.subtitle}>Log in to access your BudgetBite kitchen</p>

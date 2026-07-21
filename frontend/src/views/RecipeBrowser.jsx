@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 const { DEFAULT_PAGE_SIZE, DEFAULT_SORT_MODE } = require('../constants');
 const { recipeBrowserStyles } = require('./recipeBrowserStyles');
 const { fetchRecipesWithBudgets } = require('../services/apiService');
 
+// Compares two recipe titles for A-Z sorting, pushing titles that don't start with a letter (e.g. leading quotes) after titles starting with Z
+function compareTitlesAlphabetically(titleA, titleB) {
+  const a = titleA || '';
+  const b = titleB || '';
+  const aStartsWithLetter = /^[a-z]/i.test(a);
+  const bStartsWithLetter = /^[a-z]/i.test(b);
+
+  if (aStartsWithLetter && !bStartsWithLetter) return -1;
+  if (!aStartsWithLetter && bStartsWithLetter) return 1;
+  return a.localeCompare(b);
+}
+
 // RecipeBrowser component allows users to search for recipes and view them in a paginated format
 function RecipeBrowser() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [allRecipes, setAllRecipes] = useState([]);
@@ -65,8 +79,8 @@ function RecipeBrowser() {
       currentPage += 1;
     }
 
-    // Sort the collected recipes alphabetically by title and paginate the results based on the requested page and page size
-    const sortedRecipes = [...collectedRecipes].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    // Sort the collected recipes alphabetically by title, treating titles that don't start with a letter (e.g. leading quotes) as coming after Z
+    const sortedRecipes = [...collectedRecipes].sort((a, b) => compareTitlesAlphabetically(a.title, b.title));
     const startIndex = (page - 1) * pageSize;
     const pagedRecipes = sortedRecipes.slice(startIndex, startIndex + pageSize);
 
@@ -121,27 +135,17 @@ function RecipeBrowser() {
     }
   };
 
-  // Handle the "Show All (A-Z)" button click to reset the search query and fetch all recipes
-  const handleGetAll = () => {
-    setSearchQuery('');
-    setSortMode(DEFAULT_SORT_MODE);
-    executeSearch('recipes', 1, null, DEFAULT_SORT_MODE);
-  };
-
   const handleInitialLoad = () => {
     setSearchQuery('');
-    setSortMode(DEFAULT_SORT_MODE);
-    executeSearch('recipes', 1, null, DEFAULT_SORT_MODE);
-  };
-
-  const handleSortAlphabetically = () => {
     setSortMode('az');
-    executeSearch(activeQuery || 'recipes', 1, null, 'az');
+    executeSearch('recipes', 1, null, 'az');
   };
 
   // Handle pagination when the user clicks on the "Next" or "Previous" buttons
   const handlePageChange = (nextPage) => {
     if (nextPage < 1 || nextPage > totalPages || nextPage === currentPage) return;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (sortMode === 'az') {
       const startIndex = (nextPage - 1) * pageSize;
@@ -186,10 +190,6 @@ function RecipeBrowser() {
             />
             <button type="submit" style={styles.button} className="bb-btn-primary">Search</button>
           </form>
-
-          <button onClick={handleSortAlphabetically} style={styles.getAllButton} className="bb-btn-outline">
-            Show All (A-Z)
-          </button>
         </div>
 
         {loading && <p style={styles.loadingText}>🍊 Loading recipes...</p>}
@@ -200,13 +200,18 @@ function RecipeBrowser() {
             {/* <p style={styles.paginationInfo}>Showing {recipes.length} of {totalHits} recipes • Page {currentPage} of {totalPages}</p> */}
             <div style={styles.grid}>
               {recipes.map((recipe, index) => (
-                <div key={recipe.id || index} style={styles.card} className="bb-card">
+                <div
+                  key={recipe.id || index}
+                  style={{ ...styles.card, cursor: 'pointer' }}
+                  className="bb-card"
+                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
+                >
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
                   <h4 style={styles.title}>{recipe.title || "Untitled Recipe"}</h4>
                   <p style={styles.source}>Source: <em>{recipe.source || "Unknown Source"}</em></p>
-                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.link} className="bb-link">
+                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.link} className="bb-link" onClick={(e) => e.stopPropagation()}>
                     View Full Recipe Instructions
                   </a>
                 </div>

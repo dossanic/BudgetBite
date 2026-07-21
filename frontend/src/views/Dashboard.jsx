@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 const { dashboardStyles } = require('./dashboardStyles');
-const { fetchRecipesWithBudgets } = require('../services/apiService');
+const { fetchRecipesWithBudgets, fetchRandomRecipes } = require('../services/apiService');
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [pantryList, setPantryList] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [randomRecipes, setRandomRecipes] = useState([]);
+  const [randomLoading, setRandomLoading] = useState(true);
+
+  useEffect(() => {
+    const loadRandomRecipes = async () => {
+      try {
+        const recipes = await fetchRandomRecipes(3);
+        setRandomRecipes(recipes);
+      } catch (err) {
+        console.error("Dashboard Random Recipes Error:", err);
+      } finally {
+        setRandomLoading(false);
+      }
+    };
+
+    loadRandomRecipes();
+  }, []);
 
   const addIngredient = (item) => setPantryList((prevList) => [...prevList, item]);
   const removeIngredient = (itemToRemove) => setPantryList((prevList) => prevList.filter(item => item !== itemToRemove));
@@ -46,6 +65,32 @@ function Dashboard() {
           />
         </div>
 
+        {!randomLoading && randomRecipes.length > 0 && (
+          <div style={styles.gridSection}>
+            <h3 style={styles.gridTitle}></h3>
+
+            <div style={styles.grid}>
+              {randomRecipes.map((recipe, index) => (
+                <div
+                  key={recipe.id || index}
+                  style={{ ...styles.card, cursor: 'pointer' }}
+                  className="bb-card"
+                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
+                >
+                  {recipe.image && (
+                    <img src={recipe.image} alt={recipe.title} style={styles.image} />
+                  )}
+                  <h4 style={styles.recipeTitle}>{recipe.title || "Untitled Recipe"}</h4>
+                  <p style={styles.recipeSource}>Source: <em>{recipe.source || "Unknown Source"}</em></p>
+                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.recipeLink} className="bb-link" onClick={(e) => e.stopPropagation()}>
+                    View Full Recipe Instructions
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {loading && <p style={styles.loadingText}>🍊 Loading Recipes...</p>}
         {error && <p style={styles.errorText}>Error: {error}</p>}
 
@@ -55,13 +100,18 @@ function Dashboard() {
             
             <div style={styles.grid}>
               {recipes.map((recipe, index) => (
-                <div key={recipe.id || index} style={styles.card} className="bb-card">
+                <div
+                  key={recipe.id || index}
+                  style={{ ...styles.card, cursor: 'pointer' }}
+                  className="bb-card"
+                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
+                >
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
                   <h4 style={styles.recipeTitle}>{recipe.title || "Untitled Recipe"}</h4>
                   <p style={styles.recipeSource}>Source: <em>{recipe.source || "Unknown Source"}</em></p>
-                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.recipeLink} className="bb-link">
+                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.recipeLink} className="bb-link" onClick={(e) => e.stopPropagation()}>
                     View Full Recipe Instructions
                   </a>
                 </div>

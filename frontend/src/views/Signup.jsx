@@ -1,6 +1,7 @@
 // src/views/Signup.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import BackgroundPeaches from '../components/BackgroundPeaches';
 const { supabase } = require('../services/supabaseClient');
 const { theme } = require('../theme');
 
@@ -38,6 +39,8 @@ function Signup() {
 
   const styles = {
     wrapper: {
+      position: 'relative',
+      zIndex: 0,
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -136,6 +139,7 @@ function Signup() {
 
   return (
     <div style={styles.wrapper}>
+      <BackgroundPeaches />
       <main style={styles.card}>
         <h2 style={styles.title}>Create Account</h2>
         <p style={styles.subtitle}>Join BudgetBite to track pantry costs and recipes</p>

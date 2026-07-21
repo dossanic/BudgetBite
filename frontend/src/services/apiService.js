@@ -100,4 +100,79 @@ const fetchRecipesWithBudgets = async (pantryList, options = {}) => {
   };
 };
 
-module.exports = { fetchRecipesWithBudgets };
+// Function to fetch a random sample of recipes (e.g. for dashboard "recipe ideas")
+const fetchRandomRecipes = async (count = 3) => {
+  const recipeResponse = await fetch(`${API_BASE_URL}/recipes?pageSize=20`); // Fetch a batch of generic recipes from the backend
+  if (!recipeResponse.ok) throw new Error('Failed to fetch recipes from server.');
+
+  const recipeData = await recipeResponse.json();
+  const extractedRecipes = recipeData.hits || [];
+
+  const mappedRecipes = extractedRecipes.map((hit) => {
+    const currentRecipe = hit.recipe;
+    const recipeId = extractRecipeId(currentRecipe.uri);
+
+    return {
+      id: recipeId || currentRecipe.uri,
+      title: currentRecipe.label,
+      image: currentRecipe.image,
+      source: currentRecipe.source,
+      recipeUrl: currentRecipe.url
+    };
+  });
+
+  // Shuffle (Fisher-Yates) and take the first `count`
+  for (let i = mappedRecipes.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [mappedRecipes[i], mappedRecipes[j]] = [mappedRecipes[j], mappedRecipes[i]];
+  }
+
+  return mappedRecipes.slice(0, count);
+};
+
+// Function to fetch a single recipe's full details, including all ingredients and price estimates
+const fetchRecipeDetails = async (recipeId) => {
+  const recipeResponse = await fetch(`${API_BASE_URL}/recipes/${encodeURIComponent(recipeId)}`);
+  if (!recipeResponse.ok) throw new Error('Failed to fetch recipe details from server.');
+
+  const recipe = await recipeResponse.json();
+  const ingredients = recipe.ingredients || [];
+  const ingredientTexts = ingredients.map((item) => item.text || '').filter(Boolean);
+
+  let priceSummary = { totalMin: 0, totalMax: 0 };
+  let priceBreakdown = [];
+  let notFound = [];
+
+  if (ingredientTexts.length > 0) {
+    try {
+      const priceResponse = await fetch(`${API_BASE_URL}/ingredients/price`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ingredients: ingredientTexts })
+      });
+
+      if (priceResponse.ok) {
+        const budgetData = await priceResponse.json();
+        priceSummary = { totalMin: budgetData.summary?.totalMin || 0, totalMax: budgetData.summary?.totalMax || 0 };
+        priceBreakdown = budgetData.breakdown || [];
+        notFound = budgetData.notFound || [];
+      }
+    } catch (err) {
+      console.error('Error fetching price estimates for recipe details:', err);
+    }
+  }
+
+  return {
+    id: recipe.id,
+    title: recipe.title,
+    image: recipe.image,
+    source: recipe.source,
+    recipeUrl: recipe.recipeUrl,
+    ingredients,
+    priceSummary,
+    priceBreakdown,
+    notFound
+  };
+};
+
+module.exports = { fetchRecipesWithBudgets, fetchRandomRecipes, fetchRecipeDetails };
