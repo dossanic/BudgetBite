@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 const { theme } = require('../theme');
 
-function Footer({ setView }) {
+function Footer() {
+  const navigate = useNavigate();
+
   const styles = {
     footer: {
       background: theme.color.primaryLight,
@@ -59,9 +62,9 @@ function Footer({ setView }) {
 
         <div style={styles.linksCol}>
           <span style={styles.colTitle}>Navigate</span>
-          <button onClick={() => setView('dashboard')} style={styles.navLink} className="bb-nav-link">Home</button>
-          <button onClick={() => setView('browser')} style={styles.navLink} className="bb-nav-link">Recipes</button>
-          <button onClick={() => setView('saved')} style={styles.navLink} className="bb-nav-link">Saved</button>
+          <button onClick={() => navigate('/')} style={styles.navLink} className="bb-nav-link">Home</button>
+          <button onClick={() => navigate('/recipes')} style={styles.navLink} className="bb-nav-link">Recipes</button>
+          <button onClick={() => navigate('/saved')} style={styles.navLink} className="bb-nav-link">Saved</button>
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 const { DEFAULT_PAGE_SIZE, DEFAULT_SORT_MODE } = require('../constants');
 const { recipeBrowserStyles } = require('./recipeBrowserStyles');
 const { fetchRecipesWithBudgets } = require('../services/apiService');
@@ -17,6 +18,7 @@ function compareTitlesAlphabetically(titleA, titleB) {
 
 // RecipeBrowser component allows users to search for recipes and view them in a paginated format
 function RecipeBrowser() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [allRecipes, setAllRecipes] = useState([]);
@@ -198,13 +200,18 @@ function RecipeBrowser() {
             {/* <p style={styles.paginationInfo}>Showing {recipes.length} of {totalHits} recipes • Page {currentPage} of {totalPages}</p> */}
             <div style={styles.grid}>
               {recipes.map((recipe, index) => (
-                <div key={recipe.id || index} style={styles.card} className="bb-card">
+                <div
+                  key={recipe.id || index}
+                  style={{ ...styles.card, cursor: 'pointer' }}
+                  className="bb-card"
+                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
+                >
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
                   <h4 style={styles.title}>{recipe.title || "Untitled Recipe"}</h4>
                   <p style={styles.source}>Source: <em>{recipe.source || "Unknown Source"}</em></p>
-                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.link} className="bb-link">
+                  <a href={recipe.recipeUrl} target="_blank" rel="noopener noreferrer" style={styles.link} className="bb-link" onClick={(e) => e.stopPropagation()}>
                     View Full Recipe Instructions
                   </a>
                 </div>

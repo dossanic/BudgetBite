@@ -37,10 +37,16 @@ function buildIngredientSearchUrlWithQuery(query, page = 1, pageSize = 10) {  //
 function buildIngredientSearchUrlWithRecipeId(recipeId) {
   const params = new URLSearchParams({
     type: 'public',
-    field: 'ingredients',
     app_id: apiId,
     app_key: apiKey
   });
+
+  // Specify the fields to retrieve from the API
+  params.append('field', 'label');
+  params.append('field', 'image');
+  params.append('field', 'source');
+  params.append('field', 'url');
+  params.append('field', 'ingredients');
 
   return `${apiUrl}/${recipeId}?${params.toString()}`;
 }

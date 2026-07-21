@@ -1,5 +1,5 @@
 const { fetchFromEdamam } = require('../services/edamamService');
-const { buildIngredientSearchUrlWithQuery, edamamAccountUser } = require('../config');
+const { buildIngredientSearchUrlWithQuery, buildIngredientSearchUrlWithRecipeId, edamamAccountUser } = require('../config');
 
 // Function to get multiple recipes based on a query and pagination parameters
 async function getMultipleRecipes(req, res) {
@@ -33,4 +33,40 @@ async function getMultipleRecipes(req, res) {
     }
 }
 
-module.exports = { getRecipes: getMultipleRecipes };
+// Function to get a single recipe's full details (including all ingredients) by its Edamam recipe ID
+async function getRecipeById(req, res) {
+    const recipeId = String(req.params?.id || '').trim();
+    if (!recipeId) {
+        return res.status(400).send('Bad Request: use "/recipes/:id"');
+    }
+
+    try {
+        const url = buildIngredientSearchUrlWithRecipeId(recipeId);
+        const data = await fetchFromEdamam(url, edamamAccountUser);
+
+        const rawIngredients = data.recipe?.ingredients;
+        if (!Array.isArray(rawIngredients)) {
+            throw new TypeError(
+                'Invalid response: object is not an array\n' +
+                'data: ' + JSON.stringify(data, null, 2)
+            );
+        }
+
+        res.json({
+            id: recipeId,
+            title: data.recipe.label,
+            image: data.recipe.image,
+            source: data.recipe.source,
+            recipeUrl: data.recipe.url,
+            ingredients: rawIngredients
+        });
+
+    } catch (err) {
+        console.error(err);
+        if (err instanceof TypeError)
+            return res.status(502).send(err.message);
+        return res.status(500).send('Error fetching data');
+    }
+}
+
+module.exports = { getRecipes: getMultipleRecipes, getRecipeById };

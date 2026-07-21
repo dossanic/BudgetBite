@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Used to programmatically redi
 const { supabase } = require('../services/supabaseClient'); // Supabase client wrapper containing initialized instance configs
 const { theme } = require('../theme');
 
-// setView
-function Header({ setView, user }) {
+function Header({ user }) {
   const navigate = useNavigate();
 
   // Handle logging out through Supabase Auth
@@ -72,31 +71,31 @@ function Header({ setView, user }) {
       <div style={styles.contentWrapper}>
         {/* Brand Title / Clicking returns home */}
         <div>
-          <h1 style={styles.logo} onClick={() => setView('dashboard')}>
+          <h1 style={styles.logo} onClick={() => navigate('/')}>
             CheapChomp
           </h1>
         </div>
 
-        {/* Primary Application Navigation (State-Based View Routing) */}
+        {/* Primary Application Navigation */}
         <nav>
           <ul style={styles.navList}>
             {/* Dashboard / Homepage */}
             <li>
-              <button onClick={() => setView('dashboard')} style={styles.navLink} className="bb-nav-link">
+              <button onClick={() => navigate('/')} style={styles.navLink} className="bb-nav-link">
                 Home
               </button>
             </li>
 
             {/* 2. Recipe Browser */}
             <li>
-              <button onClick={() => setView('browser')} style={styles.navLink} className="bb-nav-link">
+              <button onClick={() => navigate('/recipes')} style={styles.navLink} className="bb-nav-link">
                 Recipes
               </button>
             </li>
 
             {/* 3. Saved Recipes Page */}
             <li>
-              <button onClick={() => setView('saved')} style={styles.navLink} className="bb-nav-link">
+              <button onClick={() => navigate('/saved')} style={styles.navLink} className="bb-nav-link">
                 Saved
               </button>
             </li>
