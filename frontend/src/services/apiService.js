@@ -100,6 +100,47 @@ const fetchRecipesWithBudgets = async (pantryList, options = {}) => {
   };
 };
 
+// Function to fetch a plain list of recipes (no per-recipe missing-ingredients/price calls) --
+// use this instead of fetchRecipesWithBudgets when the caller won't display cost info,
+// since that function fires two extra network calls (one of which can hit Groq) per recipe.
+const fetchRecipesList = async (query, options = {}) => {
+  const page = options.page || 1;
+  const pageSize = options.pageSize || 10;
+  const nextUrl = options.nextUrl ? encodeURIComponent(options.nextUrl) : '';
+  const sortMode = options.sortMode || 'random';
+  const requestPageSize = sortMode === 'az' ? 100 : pageSize; // Match fetchRecipesWithBudgets so A-Z accumulation still works
+
+  const recipeResponse = await fetch(`${API_BASE_URL}/recipes?q=${encodeURIComponent(query)}&page=${page}&pageSize=${requestPageSize}${nextUrl ? `&nextUrl=${nextUrl}` : ''}`);
+  if (!recipeResponse.ok) throw new Error('Failed to fetch recipes from server.');
+
+  const recipeData = await recipeResponse.json();
+  const extractedRecipes = recipeData.hits || [];
+
+  const recipes = extractedRecipes.map((hit) => {
+    const currentRecipe = hit.recipe;
+    const recipeId = extractRecipeId(currentRecipe.uri);
+
+    return {
+      id: recipeId || currentRecipe.uri,
+      title: currentRecipe.label,
+      image: currentRecipe.image,
+      source: currentRecipe.source,
+      recipeUrl: currentRecipe.url
+    };
+  });
+
+  return {
+    recipes,
+    pagination: {
+      page: recipeData.page || page,
+      pageSize: recipeData.pageSize || pageSize,
+      totalPages: recipeData.totalPages || 1,
+      totalHits: recipeData.totalHits || 0,
+      nextPageUrl: recipeData.nextPageUrl || null
+    }
+  };
+};
+
 // Function to fetch a random sample of recipes (e.g. for dashboard "recipe ideas")
 const fetchRandomRecipes = async (count = 3) => {
   const recipeResponse = await fetch(`${API_BASE_URL}/recipes?pageSize=20`); // Fetch a batch of generic recipes from the backend
@@ -203,4 +244,4 @@ const removeFavorite = async (userId, recipeId) => {
   return response.json();
 };
 
-module.exports = { fetchRecipesWithBudgets, fetchRandomRecipes, fetchRecipeDetails, fetchFavorites, addFavorite, removeFavorite };
+module.exports = { fetchRecipesWithBudgets, fetchRecipesList, fetchRandomRecipes, fetchRecipeDetails, fetchFavorites, addFavorite, removeFavorite };

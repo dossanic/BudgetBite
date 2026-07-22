@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import FavoriteButton from '../components/FavoriteButton';
 const { DEFAULT_PAGE_SIZE, DEFAULT_SORT_MODE } = require('../constants');
 const { recipeBrowserStyles } = require('./recipeBrowserStyles');
-const { fetchRecipesWithBudgets, fetchFavorites, addFavorite, removeFavorite } = require('../services/apiService');
+const { fetchRecipesWithBudgets, fetchRecipesList, fetchFavorites, addFavorite, removeFavorite } = require('../services/apiService');
 
 // Compares two recipe titles for A-Z sorting, pushing titles that don't start with a letter (e.g. leading quotes) after titles starting with Z
 function compareTitlesAlphabetically(titleA, titleB) {
@@ -84,7 +84,10 @@ function RecipeBrowser({ user }) {
 
     // Loop to fetch recipes until the maximum number of results is reached or there are no more pages available
     while (collectedRecipes.length < maxResults && (currentPage === 1 || currentNextUrl)) {
-      const pageResult = await fetchRecipesWithBudgets([query], {
+      // Was: fetchRecipesWithBudgets([query], { page: currentPage, pageSize: DEFAULT_PAGE_SIZE, nextUrl: currentNextUrl, sortMode: DEFAULT_SORT_MODE });
+      // Switched to fetchRecipesList since these cards never display cost/missing-ingredients info,
+      // and the old call fired 2 extra network calls (one potentially hitting Groq) per recipe.
+      const pageResult = await fetchRecipesList(query, {
         page: currentPage,
         pageSize: DEFAULT_PAGE_SIZE,
         nextUrl: currentNextUrl,
@@ -138,7 +141,9 @@ function RecipeBrowser({ user }) {
         result = await fetchAlphabetizedRecipes(query, page);
         setAllRecipes(result.allRecipes || []);
       } else {
-        result = await fetchRecipesWithBudgets([query], { page, pageSize, nextUrl: pageUrl, sortMode });
+        // Was: fetchRecipesWithBudgets([query], { page, pageSize, nextUrl: pageUrl, sortMode });
+        // Switched to fetchRecipesList -- see note in fetchAlphabetizedRecipes above.
+        result = await fetchRecipesList(query, { page, pageSize, nextUrl: pageUrl, sortMode });
         setAllRecipes(result.recipes || []);
       }
 
