@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 // API credentials
 const apiId = process.env.API_ID;
