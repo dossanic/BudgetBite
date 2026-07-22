@@ -30,10 +30,11 @@ function Header({ user }) {
       width: '100%'
     },
     logoImg: {
-      height: '42px',
+      height: '70px',
       width: 'auto',
       cursor: 'pointer',
-      userSelect: 'none'
+      userSelect: 'none',
+      marginTop: '8px'
     },
     navList: { display: 'flex', listStyle: 'none', gap: '20px', margin: 0, padding: 0 },
     navLink: {
@@ -102,7 +103,7 @@ function Header({ user }) {
         {/* User Session Metadata & Actions Section */}
         <div style={styles.userSection}>
           {/* Dynamically reads user email from the passed Supabase auth token session */}
-          <span>Welcome, {user?.email || "User"}</span>
+          <span>Welcome, {user?.user_metadata?.username || user?.email || "User"}</span>
           
           {/* Logout action button */}
           <button onClick={handleLogout} style={styles.logoutBtn} className="bb-btn-primary">

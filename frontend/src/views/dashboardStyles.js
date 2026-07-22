@@ -4,7 +4,7 @@ const dashboardStyles = {
   container: { padding: '30px', minHeight: '100vh' },
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   heading: { color: theme.color.text, borderBottom: `2px solid ${theme.color.border}`, paddingBottom: '10px', marginBottom: '20px' },
-  subtitle: { color: theme.color.textMuted, fontSize: '1.05em', lineHeight: '1.5', maxWidth: '640px', margin: '0 0 25px 0' },
+  subtitle: { color: theme.color.textMuted, fontSize: '1.05em', lineHeight: '1.5', whiteSpace: 'nowrap', margin: '0 0 25px 0' },
   panel: {
     backgroundColor: theme.color.white,
     border: `1px solid ${theme.color.border}`,

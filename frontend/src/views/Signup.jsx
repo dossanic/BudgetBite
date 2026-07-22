@@ -8,6 +8,7 @@ const { theme } = require('../theme');
 function Signup() {
   const navigate = useNavigate();
 
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [uiError, setUiError] = useState(null);
@@ -21,6 +22,7 @@ function Signup() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password: password,
+      options: { data: { username: username.trim() } },
     });
 
     if (error) {
@@ -30,7 +32,10 @@ function Signup() {
 
     console.log('Signup data:', data);
     setUiSuccess(true);
-    
+
+    // signUp() auto-creates a session; sign back out so the user has to log in themselves
+    await supabase.auth.signOut();
+
     // Smooth transition delay so users see the success message before redirecting
     setTimeout(() => {
       navigate('/login');
@@ -153,6 +158,19 @@ function Signup() {
         )}
 
         <form onSubmit={handleSignup}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Username</label>
+            <input
+              type="text"
+              placeholder="Choose a username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              style={styles.input}
+              className="bb-input"
+              required
+            />
+          </div>
+
           <div style={styles.inputGroup}>
             <label style={styles.label}>Email Address</label>
             <input
