@@ -103,27 +103,28 @@ async function getPriceEstimate(req, res) {
       }
     } else {
       try {
-        const notFoundName = notFound.map((item) => item.ingredient); // Extract ingredient names from notFound array to pass to Groq service
-        const priceEstimates = await estimatePrice(notFoundName, location); // Call the Groq AI service and send the name and location to get the estimate
+        // De-dupe before asking Groq: the prompt asks it to skip repeated ingredients,
+        // so sending duplicate lines (e.g. "kosher salt" appearing twice) shifts the
+        // response array out of alignment with the request array.
+        const uniqueNames = [...new Set(notFound.map((item) => item.ingredient))];
+        const priceEstimates = await estimatePrice(uniqueNames, location); // Call the Groq AI service and send the name and location to get the estimate
 
-        for (const estimate of priceEstimates || []) {
-          totalMin += estimate.min;
-          totalMax += estimate.max;
+        // Match estimates back to our own requested names by position rather than
+        // trusting the model to echo the name back verbatim (it often strips
+        // quantities/units), since our own name is what the frontend matches against.
+        const estimateByName = new Map();
+        uniqueNames.forEach((name, i) => {
+          if (priceEstimates[i]) estimateByName.set(name, priceEstimates[i]);
+        });
 
-          // Push the ingredient and price to the found array
-          found.push({
-            ingredient: estimate.ingredient,
-            min: estimate.min,
-            max: estimate.max,
-          });
-
-          // Upsert the new price estimate into the database
-          // onConflict: the "name" will be update if it already exists in the database, if not then insert a new row, avoid duplicate
+        for (const [name, estimate] of estimateByName.entries()) {
+          // Upsert the new price estimate into the database, keyed by our own
+          // normalized name so future exact-text lookups hit the cache.
           const { error: upsertError } = await supabase
             .from("ingredient_prices")
             .upsert(
               {
-                name: estimate.ingredient.toLowerCase(),
+                name,
                 price_min: estimate.min,
                 price_max: estimate.max,
                 unit_type: estimate.unit_type,
@@ -134,7 +135,25 @@ async function getPriceEstimate(req, res) {
             );
         }
 
+        const stillNotFound = [];
+        for (const item of notFound) {
+          const estimate = estimateByName.get(item.ingredient);
+          if (estimate) {
+            totalMin += estimate.min;
+            totalMax += estimate.max;
+            found.push({
+              ingredient: item.ingredient,
+              min: estimate.min,
+              max: estimate.max,
+            });
+          } else {
+            item.message = "Price estimate unavailable right now";
+            stillNotFound.push(item);
+          }
+        }
+
         notFound.length = 0;
+        notFound.push(...stillNotFound);
         groqCircuit.consecutiveFailures = 0;
       } catch (err) {
         groqCircuit.consecutiveFailures += 1;

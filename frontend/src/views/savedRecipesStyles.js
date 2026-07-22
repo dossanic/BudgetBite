@@ -1,22 +1,21 @@
 const { theme } = require('../theme');
 
-const dashboardStyles = {
+const savedRecipesStyles = {
   container: { padding: '30px', minHeight: '100vh' },
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   heading: { color: theme.color.text, borderBottom: `2px solid ${theme.color.border}`, paddingBottom: '10px', marginBottom: '20px' },
   subtitle: { color: theme.color.textMuted, fontSize: '1.05em', lineHeight: '1.5', maxWidth: '640px', margin: '0 0 25px 0' },
-  panel: {
-    backgroundColor: theme.color.white,
-    border: `1px solid ${theme.color.border}`,
-    borderRadius: theme.radius.lg,
-    boxShadow: theme.shadow.panel,
-    padding: '28px',
-    marginBottom: '10px'
-  },
   loadingText: { color: theme.color.primary, fontWeight: 'bold', fontSize: '1.1em' },
   errorText: { color: theme.color.danger, fontWeight: 'bold' },
-  gridSection: { marginTop: '40px' },
-  gridTitle: { color: '#222', fontSize: '1.5em', marginBottom: '15px' },
+  empty: {
+    color: theme.color.textFaint,
+    textAlign: 'center',
+    padding: '40px 20px',
+    border: `1px dashed ${theme.color.primaryBorder}`,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.color.primaryLight,
+    fontStyle: 'italic'
+  },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' },
   card: {
     position: 'relative',
@@ -42,8 +41,7 @@ const dashboardStyles = {
     borderRadius: theme.radius.sm,
     fontWeight: 'bold',
     fontSize: '0.95em'
-  },
-  placeholder: { color: theme.color.textFaint, marginTop: '25px', fontStyle: 'italic' }
+  }
 };
 
-module.exports = { dashboardStyles };
+module.exports = { savedRecipesStyles };

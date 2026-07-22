@@ -8,7 +8,7 @@ async function fetchFromEdamam(fullUrl, edamamAccountUser) {
     
     // Check if the response is OK (status code 200-299)
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     return response.json();

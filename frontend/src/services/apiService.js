@@ -175,4 +175,32 @@ const fetchRecipeDetails = async (recipeId) => {
   };
 };
 
-module.exports = { fetchRecipesWithBudgets, fetchRandomRecipes, fetchRecipeDetails };
+// Function to fetch a user's favorited recipes, or check whether one specific recipe is favorited
+const fetchFavorites = async (userId, recipeId = null) => {
+  const url = `${API_BASE_URL}/favorites?user_id=${encodeURIComponent(userId)}${recipeId ? `&recipe_id=${encodeURIComponent(recipeId)}` : ''}`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Failed to fetch favorites.');
+  return response.json(); // { favorites: [...] } or { favorited: boolean }
+};
+
+// Function to favorite a recipe
+const addFavorite = async (userId, recipe) => {
+  const response = await fetch(`${API_BASE_URL}/favorites`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, recipe })
+  });
+  if (!response.ok) throw new Error('Failed to save favorite.');
+  return response.json();
+};
+
+// Function to unfavorite a recipe
+const removeFavorite = async (userId, recipeId) => {
+  const response = await fetch(`${API_BASE_URL}/favorites?user_id=${encodeURIComponent(userId)}&recipe_id=${encodeURIComponent(recipeId)}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) throw new Error('Failed to remove favorite.');
+  return response.json();
+};
+
+module.exports = { fetchRecipesWithBudgets, fetchRandomRecipes, fetchRecipeDetails, fetchFavorites, addFavorite, removeFavorite };

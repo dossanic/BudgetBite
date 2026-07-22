@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
+import FavoriteButton from '../components/FavoriteButton';
 const { dashboardStyles } = require('./dashboardStyles');
-const { fetchRecipesWithBudgets, fetchRandomRecipes } = require('../services/apiService');
+const { fetchRecipesWithBudgets, fetchRandomRecipes, fetchFavorites, addFavorite, removeFavorite } = require('../services/apiService');
 
-function Dashboard() {
+function Dashboard({ user }) {
   const navigate = useNavigate();
   const [pantryList, setPantryList] = useState([]);
   const [recipes, setRecipes] = useState([]);
@@ -12,6 +13,8 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [randomRecipes, setRandomRecipes] = useState([]);
   const [randomLoading, setRandomLoading] = useState(true);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [favoritedIds, setFavoritedIds] = useState(() => new Set());
 
   useEffect(() => {
     const loadRandomRecipes = async () => {
@@ -28,10 +31,31 @@ function Dashboard() {
     loadRandomRecipes();
   }, []);
 
+  useEffect(() => {
+    fetchFavorites(user.id)
+      .then((data) => setFavoritedIds(new Set((data.favorites || []).map((r) => r.id))))
+      .catch((err) => console.error("Dashboard Favorites Fetch Error:", err));
+  }, [user.id]);
+
+  const toggleFavorite = (recipe) => {
+    const isFavorited = favoritedIds.has(recipe.id);
+
+    setFavoritedIds((prev) => {
+      const next = new Set(prev);
+      if (isFavorited) next.delete(recipe.id);
+      else next.add(recipe.id);
+      return next;
+    });
+
+    const request = isFavorited ? removeFavorite(user.id, recipe.id) : addFavorite(user.id, recipe);
+    request.catch((err) => console.error("Dashboard Favorite Toggle Error:", err));
+  };
+
   const addIngredient = (item) => setPantryList((prevList) => [...prevList, item]);
   const removeIngredient = (itemToRemove) => setPantryList((prevList) => prevList.filter(item => item !== itemToRemove));
 
   const handlePantryRecipeSearch = async () => {
+    setHasSearched(true);
     setLoading(true);
     setError(null);
     setRecipes([]);
@@ -65,7 +89,7 @@ function Dashboard() {
           />
         </div>
 
-        {!randomLoading && randomRecipes.length > 0 && (
+        {!randomLoading && !hasSearched && randomRecipes.length > 0 && (
           <div style={styles.gridSection}>
             <h3 style={styles.gridTitle}></h3>
 
@@ -75,8 +99,14 @@ function Dashboard() {
                   key={recipe.id || index}
                   style={{ ...styles.card, cursor: 'pointer' }}
                   className="bb-card"
-                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
+                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`, { state: { pantryList } })}
                 >
+                  <FavoriteButton
+                    filled={favoritedIds.has(recipe.id)}
+                    onToggle={() => toggleFavorite(recipe)}
+                    overlay
+                    style={{ position: 'absolute', top: '10px', right: '10px' }}
+                  />
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
@@ -104,8 +134,14 @@ function Dashboard() {
                   key={recipe.id || index}
                   style={{ ...styles.card, cursor: 'pointer' }}
                   className="bb-card"
-                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
+                  onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`, { state: { pantryList } })}
                 >
+                  <FavoriteButton
+                    filled={favoritedIds.has(recipe.id)}
+                    onToggle={() => toggleFavorite(recipe)}
+                    overlay
+                    style={{ position: 'absolute', top: '10px', right: '10px' }}
+                  />
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}

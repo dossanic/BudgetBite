@@ -8,6 +8,7 @@ import BackgroundPeaches from './components/BackgroundPeaches';
 import Dashboard from './views/Dashboard';
 import RecipeBrowser from './views/RecipeBrowser';
 import RecipeDetails from './views/RecipeDetails';
+import SavedRecipes from './views/SavedRecipes';
 import Login from './views/Login';
 import Signup from './views/Signup';
 
@@ -27,16 +28,6 @@ function AppShell({ user }) {
         </main>
       </div>
       <Footer />
-    </div>
-  );
-}
-
-// Placeholder for the Saved Recipes page (Phase 5)
-function SavedPlaceholder() {
-  return (
-    <div style={appStyles.savedViewContainer}>
-      <h2 style={appStyles.savedViewHeading}>Your Saved Collections</h2>
-      <p style={appStyles.savedViewText}>Coming soon!</p>
     </div>
   );
 }
@@ -95,16 +86,16 @@ function App() {
           element={user ? <AppShell user={user} /> : <Navigate to="/login" replace />}
         >
           {/* 1. Pantry Dashboard (Homepage) */}
-          <Route index element={<Dashboard />} />
+          <Route index element={<Dashboard user={user} />} />
 
           {/* 2. Global Edamam Recipe Browser */}
-          <Route path="recipes" element={<RecipeBrowser />} />
+          <Route path="recipes" element={<RecipeBrowser user={user} />} />
 
           {/* 3. Recipe Details Page */}
-          <Route path="recipes/:id" element={<RecipeDetails />} />
+          <Route path="recipes/:id" element={<RecipeDetails user={user} />} />
 
-          {/* 4. Saved Recipes Page (Placeholder for Phase 5) */}
-          <Route path="saved" element={<SavedPlaceholder />} />
+          {/* 4. Saved Recipes Page */}
+          <Route path="saved" element={<SavedRecipes user={user} />} />
         </Route>
 
         {/* Catch-all fallback path back to root */}

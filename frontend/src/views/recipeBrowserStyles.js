@@ -30,6 +30,7 @@ const recipeBrowserStyles = {
   errorText: { color: theme.color.danger, fontWeight: 'bold' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' },
   card: {
+    position: 'relative',
     border: `1px solid ${theme.color.border}`,
     borderRadius: theme.radius.lg,
     padding: '16px',

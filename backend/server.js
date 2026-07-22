@@ -4,6 +4,7 @@ const cors = require("cors"); // Enable CORS for all routes
 const recipesRouter = require("./routes/recipes");
 const ingredientsRouter = require("./routes/ingredients");
 const missingIngredientsRouter = require("./routes/missingIngredients");
+const favoritesRouter = require("./routes/favorites");
 const { port } = require("./config");
 
 const app = express();
@@ -11,7 +12,7 @@ const app = express();
 app.use(
   cors({
     origin: "http://localhost:3001", // Allows frontend to connect
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
   }),
 );
@@ -23,6 +24,7 @@ app.use("/recipes", recipesRouter);
 app.use("/ingredients/price", require("./routes/price"));
 app.use("/ingredients", ingredientsRouter); // Deprecated -- please use /missing-ingredients instead
 app.use("/missing-ingredients", missingIngredientsRouter);
+app.use("/favorites", favoritesRouter);
 
 // Start the server
 app.listen(port, (err) => {

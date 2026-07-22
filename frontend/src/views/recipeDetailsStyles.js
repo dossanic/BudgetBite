@@ -23,7 +23,8 @@ const recipeDetailsStyles = {
     padding: '28px'
   },
   image: { width: '100%', maxHeight: '350px', objectFit: 'cover', borderRadius: theme.radius.md },
-  title: { margin: '20px 0 6px 0', fontSize: '1.8em', color: theme.color.text },
+  titleRow: { display: 'flex', alignItems: 'center', gap: '10px', margin: '20px 0 6px 0' },
+  title: { margin: 0, fontSize: '1.8em', color: theme.color.text },
   source: { margin: '0 0 16px 0', color: theme.color.textMuted, fontSize: '0.95em' },
   link: {
     display: 'inline-block',
@@ -46,7 +47,14 @@ const recipeDetailsStyles = {
     fontWeight: 'bold',
     fontSize: '1.05em'
   },
+  disclaimer: {
+    margin: '0 0 20px 0',
+    color: theme.color.textMuted,
+    fontSize: '0.8em',
+    fontStyle: 'italic'
+  },
   sectionTitle: { color: theme.color.text, fontSize: '1.3em', margin: '10px 0 12px 0' },
+  checkboxHint: { color: theme.color.textMuted, fontSize: '0.85em', margin: '0 0 10px 0' },
   ingredientList: { listStyle: 'none', margin: 0, padding: 0 },
   ingredientItem: {
     display: 'flex',
@@ -56,7 +64,20 @@ const recipeDetailsStyles = {
     borderBottom: `1px solid ${theme.color.border}`,
     gap: '12px'
   },
+  ingredientLabel: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '10px',
+    cursor: 'pointer'
+  },
+  ingredientCheckbox: {
+    cursor: 'pointer',
+    width: '16px',
+    height: '16px',
+    flexShrink: 0
+  },
   ingredientText: { color: theme.color.text },
+  ingredientTextChecked: { color: theme.color.textMuted, textDecoration: 'line-through' },
   ingredientPrice: { color: theme.color.textMuted, whiteSpace: 'nowrap', fontWeight: '600' }
 };
 

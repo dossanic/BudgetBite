@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import FavoriteButton from '../components/FavoriteButton';
 const { DEFAULT_PAGE_SIZE, DEFAULT_SORT_MODE } = require('../constants');
 const { recipeBrowserStyles } = require('./recipeBrowserStyles');
-const { fetchRecipesWithBudgets } = require('../services/apiService');
+const { fetchRecipesWithBudgets, fetchFavorites, addFavorite, removeFavorite } = require('../services/apiService');
 
 // Compares two recipe titles for A-Z sorting, pushing titles that don't start with a letter (e.g. leading quotes) after titles starting with Z
 function compareTitlesAlphabetically(titleA, titleB) {
@@ -17,8 +18,9 @@ function compareTitlesAlphabetically(titleA, titleB) {
 }
 
 // RecipeBrowser component allows users to search for recipes and view them in a paginated format
-function RecipeBrowser() {
+function RecipeBrowser({ user }) {
   const navigate = useNavigate();
+  const [favoritedIds, setFavoritedIds] = useState(() => new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [allRecipes, setAllRecipes] = useState([]);
@@ -38,6 +40,26 @@ function RecipeBrowser() {
   useEffect(() => {
     handleInitialLoad();
   }, []);
+
+  useEffect(() => {
+    fetchFavorites(user.id)
+      .then((data) => setFavoritedIds(new Set((data.favorites || []).map((r) => r.id))))
+      .catch((err) => console.error("Recipe Browser Favorites Fetch Error:", err));
+  }, [user.id]);
+
+  const toggleFavorite = (recipe) => {
+    const isFavorited = favoritedIds.has(recipe.id);
+
+    setFavoritedIds((prev) => {
+      const next = new Set(prev);
+      if (isFavorited) next.delete(recipe.id);
+      else next.add(recipe.id);
+      return next;
+    });
+
+    const request = isFavorited ? removeFavorite(user.id, recipe.id) : addFavorite(user.id, recipe);
+    request.catch((err) => console.error("Recipe Browser Favorite Toggle Error:", err));
+  };
 
   // Handle input change for the search query
   const handleInputChange = (e) => {
@@ -206,6 +228,12 @@ function RecipeBrowser() {
                   className="bb-card"
                   onClick={() => navigate(`/recipes/${encodeURIComponent(recipe.id)}`)}
                 >
+                  <FavoriteButton
+                    filled={favoritedIds.has(recipe.id)}
+                    onToggle={() => toggleFavorite(recipe)}
+                    overlay
+                    style={{ position: 'absolute', top: '10px', right: '10px' }}
+                  />
                   {recipe.image && (
                     <img src={recipe.image} alt={recipe.title} style={styles.image} />
                   )}
